@@ -1,0 +1,118 @@
+﻿/* Reseteo básico */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #000;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Navbar con gradiente */
+.navbar-custom {
+    background: linear-gradient(90deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 58%, rgba(237,221,83,1) 100%);
+}
+
+.navbar-brand {
+    color: #fff !important;
+    font-weight: bold;
+}
+
+.menu-button {
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 1.6rem;
+}
+
+/* Botón para cambiar modo */
+#themeToggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+/* Flyout del menú lateral */
+.menu-flyout {
+    position: absolute;
+    top: 56px;
+    left: 12px;
+    width: 260px;
+    background: linear-gradient(180deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 60%, rgba(237,221,83,1) 100%);
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0,0,0,.2);
+    padding: 8px;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+    z-index: 1050;
+}
+
+    .menu-flyout.open {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .menu-flyout a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 12px;
+        border-radius: 8px;
+        transition: background-color .15s ease;
+        white-space: nowrap;
+    }
+
+        .menu-flyout a:hover {
+            background-color: rgba(255,255,255,.12);
+        }
+
+/* Contenido principal */
+.content {
+    padding: 20px;
+    margin-top: 72px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.25);
+    display: none;
+    z-index: 1045;
+}
+
+    .overlay.show {
+        display: block;
+    }
+
+/* ==== MODO OSCURO ==== */
+body.dark-mode {
+    background-color: #121212;
+    color: #fff;
+}
+
+    body.dark-mode .card-info {
+        background-color: #1e1e1e !important;
+        color: #fff !important;
+    }
+
+    body.dark-mode .menu-flyout {
+        background: #1f1f1f !important;
+    }
+
+        body.dark-mode .menu-flyout a:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+    body.dark-mode #themeToggle {
+        color: black;
+    }

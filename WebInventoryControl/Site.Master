@@ -1,0 +1,112 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs"
+    Inherits="WebInventoryControl.SiteMaster" %>
+
+<!DOCTYPE html>
+<html lang="es">
+<head runat="server">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%: Page.Title %> - Toolcrib</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <link href="~/Content/pages/sitemaster.css" rel="stylesheet" />
+
+  <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+</head>
+<body>
+  <form id="form1" runat="server">
+
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+      <div class="container-fluid">
+      
+        <button class="menu-button me-3" id="btnMenu" type="button" aria-haspopup="true"
+                aria-controls="flyout" aria-expanded="false" aria-label="Abrir menú">
+          <i class="bi bi-list"></i>
+        </button>
+
+
+        <a class="navbar-brand" href="Inicio.aspx">Toolcrib</a>
+
+        <button id="themeToggle" type="button" title="Cambiar tema">
+          <i class="bi bi-moon-stars-fill"></i>
+        </button>
+      </div>
+    </nav>
+
+    <div id="flyout" class="menu-flyout" role="menu" aria-label="Menú principal">
+      <a href="Inicio.aspx"><i class="bi bi-house"></i> Inicio</a>
+      <a href="Inventario.aspx"><i class="bi bi-box-seam"></i> Inventario</a>
+      <a href="Articulos.aspx"><i class="bi bi-plus-square"></i> Agregar Producto</a>
+      <a href="Stockmaximo.aspx"><i class="bi bi-bag-plus"></i> Stock</a>
+      <a href="Usuarios.aspx"><i class="bi bi-person-plus"></i> Usuarios</a>
+      <a href="Provedores.aspx"><i class="bi bi-basket"></i> Provedores</a>
+      <a href="Huellas.aspx"><i class="bi bi-hand-index-thumb"></i> Registro de Huellas</a>
+
+      <asp:ContentPlaceHolder ID="SidebarContent" runat="server" />
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <div class="content">
+      <div class="container mt-2">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+      </div>
+    </div>
+  </form>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+      (function () {
+          const btn = document.getElementById('btnMenu');
+          const flyout = document.getElementById('flyout');
+          const overlay = document.getElementById('overlay');
+          const themeToggle = document.getElementById('themeToggle');
+          const body = document.body;
+
+          // Alternar menú lateral
+          function openMenu() {
+              flyout.classList.add('open');
+              overlay.classList.add('show');
+              btn.setAttribute('aria-expanded', 'true');
+          }
+          function closeMenu() {
+              flyout.classList.remove('open');
+              overlay.classList.remove('show');
+              btn.setAttribute('aria-expanded', 'false');
+          }
+          btn.addEventListener('click', () => {
+              flyout.classList.contains('open') ? closeMenu() : openMenu();
+          });
+          overlay.addEventListener('click', closeMenu);
+
+          // Alternar modo claro / oscuro
+          themeToggle.addEventListener('click', () => {
+              body.classList.toggle('dark-mode');
+              const icon = themeToggle.querySelector("i");
+              icon.classList.toggle("bi-sun-fill");
+              icon.classList.toggle("bi-moon-stars-fill");
+
+              // Guardar preferencia en localStorage
+              if (body.classList.contains("dark-mode")) {
+                  localStorage.setItem("theme", "dark");
+              } else {
+                  localStorage.setItem("theme", "light");
+              }
+          });
+
+          // Cargar preferencia guardada
+          window.addEventListener("DOMContentLoaded", () => {
+              if (localStorage.getItem("theme") === "dark") {
+                  body.classList.add("dark-mode");
+                  const icon = themeToggle.querySelector("i");
+                  icon.classList.add("bi-sun-fill");
+                  icon.classList.remove("bi-moon-stars-fill");
+              }
+          });
+      })();
+  </script>
+</body>
+</html>

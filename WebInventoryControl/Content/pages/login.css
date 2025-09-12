@@ -1,0 +1,85 @@
+﻿.navbar-custom {
+    background: linear-gradient(90deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 58%, rgba(237,221,83,1) 100%);
+}
+
+.navbar-brand {
+    color: #fff !important;
+    font-weight: 700;
+}
+
+#themeToggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+body {
+    background-color: #f2f3f5;
+    color: #111;
+    transition: background-color .25s ease, color .25s ease;
+    min-height: 100vh;
+}
+
+.gradient-form {
+    background-color: #ffffff;
+    transition: background-color .25s ease;
+}
+
+.card.rounded-3 {
+    background: #ffffff;
+    color: #111;
+    transition: background-color .25s ease, color .25s ease;
+}
+
+.form-control {
+    background: #fff;
+    color: #111;
+    border-color: #ced4da;
+    transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+
+    .form-control::placeholder {
+        color: #777;
+    }
+
+.gradient-custom-2 {
+    background: linear-gradient(90deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 58%, rgba(237,221,83,1) 100%);
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #eee;
+}
+
+    body.dark-mode .gradient-form {
+        background-color: #0f0f10;
+    }
+
+    body.dark-mode .card.rounded-3 {
+        background: #1e1e1e;
+        color: #f1f1f1;
+    }
+
+    body.dark-mode .form-control {
+        background: #2a2a2a;
+        color: #f1f1f1;
+        border-color: #3a3a3a;
+    }
+
+        body.dark-mode .form-control::placeholder {
+            color: #bbb;
+        }
+
+.login-logo {
+    width: 185px;
+}
+
+.brand-title {
+    font-weight: 600;
+}
+
+.login-min-height {
+    min-height: calc(100vh - 56px);
+}
