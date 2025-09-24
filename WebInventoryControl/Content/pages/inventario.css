@@ -1,34 +1,108 @@
-﻿
-.table_component {
-    overflow: auto;
-    width: 100%;
+﻿:root {
+    --accent: #22c55e;
+    --bg: #ffffff;
+    --fg: #0b1324;
+    --line: rgba(2,6,23,.14);
+    --head-bg: #1f4d6d;
+    --head-fg: #ffffff;
+    --zebra: #f5f8fb;
+    --hover: #e9eef5;
+    --radius: 16px;
+    --shadow: 0 20px 36px rgba(0,0,0,.10), 0 8px 18px rgba(0,0,0,.06);
+    --glow: none;
 }
 
-    .table_component table {
-        border: 1px solid #dddfde;
-        height: 100%;
-        width: 100%;
-        table-layout: fixed;
-        border-collapse: collapse;
-        border-spacing: 1px;
-        text-align: left;
+.table-responsive {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: auto;
+}
+
+#tblInventario {
+    margin: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+}
+
+    #tblInventario thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--head-bg);
+        color: var(--head-fg) !important;
+        font-weight: 700;
+        font-size: .85rem;
+        letter-spacing: .02em;
+        padding: .9rem 1rem !important;
+        border: 0 !important;
+        white-space: nowrap;
     }
 
-    .table_component caption {
-        caption-side: top;
-        text-align: left;
+        #tblInventario thead th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        #tblInventario thead th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+    #tblInventario tbody td {
+        color: var(--fg) !important;
+        opacity: 1 !important;
+        font-size: .98rem;
+        padding: .85rem 1rem !important;
+        border-top: 1px solid var(--line) !important;
+        background: transparent;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        word-break: break-word;
     }
 
-    .table_component th {
-        border: 1px solid #dddfde;
-        background-color: #eceff1;
-        color: #000000;
-        padding: 5px;
+    #tblInventario tbody tr:nth-child(odd) {
+        background: var(--zebra);
     }
 
-    .table_component td {
-        border: 1px solid #dddfde;
-        background-color: #ffffff;
-        color: #000000;
-        padding: 5px;
+    #tblInventario tbody tr:hover {
+        background: var(--hover);
+        transition: background .18s ease;
+    }
+
+    #tblInventario td:nth-last-child(-n+3),
+    #tblInventario th:nth-last-child(-n+3) {
+        text-align: right !important;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #tblInventario th:first-child, #tblInventario td:first-child {
+        padding-left: 1.15rem !important;
+    }
+
+    #tblInventario th:last-child, #tblInventario td:last-child {
+        padding-right: 1.15rem !important;
+    }
+
+/* MODO OSCURO: se activa sólo si el <body> tiene class="dark" */
+body.dark {
+    --bg: #0b1220;
+    --fg: #e7eef9;
+    --line: rgba(255,255,255,.12);
+    --head-bg: #12344d;
+    --head-fg: #eaf2ff;
+    --zebra: rgba(255,255,255,.04);
+    --hover: rgba(34,197,94,.07);
+    --shadow: 0 18px 36px rgba(0,0,0,.45);
+    --glow: 0 0 0 1px rgba(34,197,94,.35), 0 0 24px rgba(34,197,94,.22), 0 0 48px rgba(34,197,94,.15);
+}
+
+    body.dark .table-responsive {
+        box-shadow: var(--shadow), var(--glow);
+    }
+
+    body.dark #tblInventario tbody td {
+        color: var(--fg) !important;
     }

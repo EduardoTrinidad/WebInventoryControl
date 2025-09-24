@@ -1,4 +1,6 @@
-﻿
+﻿/* ===========================
+   Variables base (claro)
+   =========================== */
 :root {
     --card-bg: #ffffff;
     --card-fg: #0f172a;
@@ -17,6 +19,9 @@
     --shadow: 0 10px 20px rgba(0,0,0,.10), 0 6px 6px rgba(0,0,0,.08);
 }
 
+/* ===========================
+   Variables base (oscuro)
+   =========================== */
 [data-bs-theme="dark"], body.dark, body.dark-mode {
     --card-bg: #0b1220;
     --card-fg: #f1f5f9;
@@ -28,7 +33,9 @@
     --shadow: 0 10px 20px rgba(0,0,0,.35), 0 6px 6px rgba(0,0,0,.25);
 }
 
-
+/* ===========================
+   Layout tarjeta contenedora
+   =========================== */
 .wrap {
     max-width: 980px;
     margin: 24px auto;
@@ -68,196 +75,154 @@
     padding: 18px 20px;
 }
 
-.grid {
-    display: grid;
-    gap: 16px;
+/* ===========================
+   Tabla: skin .table-sleek
+   =========================== */
+
+/* Paleta por tema */
+:root {
+    --tbl-head-bg: rgba(15,23,42,.04);
+    --tbl-head-fg: var(--card-muted);
+    --tbl-row-bg: var(--field-bg);
+    --tbl-row-fg: var(--field-fg);
+    --tbl-row-border: var(--field-border);
+    --tbl-hover: rgba(42,123,155,.08);
+    --tbl-zebra: rgba(2,6,23,.03);
+    --tbl-shadow: 0 6px 12px rgba(0,0,0,.06);
+    --tbl-shadow-hover: 0 10px 22px rgba(0,0,0,.10);
+    --tbl-sticky-shadow: inset 0 -1px 0 var(--card-border);
 }
 
-@media (min-width: 860px) {
-    .grid-2 {
-        grid-template-columns: 1.2fr .8fr;
-    }
+[data-bs-theme="dark"], body.dark, body.dark-mode {
+    --tbl-head-bg: rgba(148,163,184,.10);
+    --tbl-head-fg: var(--card-fg);
+    --tbl-row-bg: #0f172a;
+    --tbl-row-fg: var(--field-fg);
+    --tbl-row-border: rgba(148,163,184,.16);
+    --tbl-hover: rgba(87,199,133,.12);
+    --tbl-zebra: rgba(148,163,184,.06);
+    --tbl-shadow: 0 6px 12px rgba(0,0,0,.30);
+    --tbl-shadow-hover: 0 14px 28px rgba(0,0,0,.35);
+    --tbl-sticky-shadow: inset 0 -1px 0 var(--card-border);
 }
 
-
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* Contenedor con scroll suave */
+.table-wrap {
+    width: 100%;
+    overflow: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
 }
 
-.label {
-    font-size: 12px;
-    color: var(--card-muted);
-}
-
-.input, .select {
-    background: var(--field-bg);
-    color: var(--field-fg);
-    border: 1px solid var(--field-border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    outline: none;
-    transition: border .2s, box-shadow .2s, transform .08s;
-}
-
-    .input:focus, .select:focus {
-        border-color: var(--focus);
-        box-shadow: 0 0 0 4px rgba(42,123,155,.15);
-    }
-
-.btns {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    background: linear-gradient(145deg, #e6e6e6, #ffffff);
-    box-shadow: 5px 5px 15px rgba(0,0,0,.15), -5px -5px 15px rgba(255,255,255,.8);
-    transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
-    user-select: none;
-}
-
-    .btn:active {
-        transform: translateY(1px) scale(.99);
+    .table-wrap::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
     }
 
-    .btn.primary {
-        background: linear-gradient(145deg, var(--accent-a), var(--accent-b));
-        color: #fff;
+    .table-wrap::-webkit-scrollbar-thumb {
+        background: var(--card-border);
+        border-radius: 999px;
     }
 
-    .btn.ghost {
+    .table-wrap::-webkit-scrollbar-track {
         background: transparent;
-        color: var(--accent-a);
-        border: 1px solid var(--field-border);
     }
 
-    .btn.warn {
-        background: linear-gradient(145deg, #f59e0b, #fbbf24);
-        color: #111827;
-    }
-
-    .btn:disabled {
-        opacity: .6;
-        cursor: not-allowed;
-    }
-
-
-.user-card {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    padding: 12px;
-    border: 1px dashed var(--card-border);
-    border-radius: 12px;
-}
-
-.avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #d1d5db;
-    object-fit: cover;
-    border: 2px solid var(--card-border);
-}
-
-.user-lines {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.25;
-}
-
-.user-name {
-    font-weight: 700;
-}
-
-.user-meta {
-    font-size: 12px;
-    color: var(--card-muted);
-}
-
-
-table.tidy {
+/* Estructura principal */
+.table-sleek {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px;
+    border-spacing: 0 10px; /* separa filas como “cards” */
+    color: var(--tbl-row-fg);
 }
 
-.tidy th {
-    text-align: left;
-    padding: 8px 10px;
-    font-size: 12px;
-    color: var(--card-muted);
-    border-bottom: 1px solid var(--card-border);
-}
-
-.tidy td {
-    background: var(--field-bg);
-    border: 1px solid var(--field-border);
-    padding: 10px 12px;
-    border-radius: 10px;
-}
-
-.mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-.row {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(12, 1fr);
-}
-
-.col-6 {
-    grid-column: span 6;
-}
-
-.col-4 {
-    grid-column: span 4;
-}
-
-.col-3 {
-    grid-column: span 3;
-}
-
-.col-12 {
-    grid-column: span 12;
-}
-
-@media (max-width: 720px) {
-    .col-6, .col-4, .col-3 {
-        grid-column: span 12;
+    /* Encabezado pegajoso con blur */
+    .table-sleek thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--tbl-head-bg);
+        color: var(--tbl-head-fg);
+        font-size: 12px;
+        letter-spacing: .2px;
+        text-transform: uppercase;
+        border: 0;
+        padding: 10px 12px;
+        backdrop-filter: saturate(140%) blur(6px);
+        box-shadow: var(--tbl-sticky-shadow);
     }
+
+    /* Celdas tipo card */
+    .table-sleek tbody td {
+        background: var(--tbl-row-bg);
+        border: 1px solid var(--tbl-row-border);
+        padding: 12px 14px;
+        vertical-align: middle;
+    }
+
+    /* Radios por fila */
+    .table-sleek tbody tr > td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .table-sleek tbody tr > td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    /* Sombra y transición */
+    .table-sleek tbody tr {
+        box-shadow: var(--tbl-shadow);
+        transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+    }
+
+        .table-sleek tbody tr:hover {
+            background: var(--tbl-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--tbl-shadow-hover);
+        }
+
+        /* Zebra sutil */
+        .table-sleek tbody tr:nth-child(even) td {
+            background: linear-gradient(0deg, var(--tbl-zebra), var(--tbl-zebra)), var(--tbl-row-bg);
+        }
+
+        /* Focus accesible */
+        .table-sleek tbody tr:focus-within,
+        .table-sleek tbody tr:focus {
+            outline: 2px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+    /* IDs en monospace */
+    .table-sleek td.id-cell {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+        font-size: 12.5px;
+        letter-spacing: .2px;
+    }
+
+/* Responsive compacto */
+@media (max-width: 576px) {
+    .table-sleek {
+        border-spacing: 0 8px;
+    }
+
+        .table-sleek thead th {
+            font-size: 11px;
+            padding: 8px 10px;
+        }
+
+        .table-sleek tbody td {
+            padding: 10px 12px;
+        }
 }
 
-.hr {
-    height: 1px;
-    background: var(--card-border);
-    margin: 10px 0 4px;
+/* Integración visual */
+.card-body .table-sleek {
+    margin-top: 6px;
 }
 
-.muted {
-    color: var(--card-muted);
-}
-
-.ok {
-    color: var(--ok);
-}
-
-.warn {
-    color: var(--warn);
-}
-
-.err {
-    color: var(--err);
+.card-body .table-wrap {
+    margin: 0 -4px;
 }

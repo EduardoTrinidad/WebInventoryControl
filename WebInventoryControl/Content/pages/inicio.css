@@ -1,75 +1,62 @@
 ﻿
-.dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    justify-content: center;
+
+:root {
+    --bg: #ffffff;
+    --text: #0f172a;
+    --border: #e5e7eb;
+    --header-bg: #f9fafb;
+    --accent: #3b82f6;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.page {
+    padding: 24px;
+}
+
+.page-header {
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--header-bg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+    .page-header h1 {
+        margin: 0;
+    }
+
+.table-wrap {
     margin-top: 20px;
+    overflow-x: auto;
 }
 
-.card {
-    --background: linear-gradient(135deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 58%, rgba(237,221,83,1) 100%);
+.info-table {
     width: 100%;
-    height: 360px;
-    padding: 5px;
-    border-radius: 1rem;
-    background: var(--background);
-    position: relative;
-    z-index: 1;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
-    .card::after {
-        position: absolute;
-        content: "";
-        top: 35px;
-        left: 0;
-        right: 0;
-        z-index: -1;
-        height: 100%;
-        width: 100%;
-        transform: scale(0.85);
-        filter: blur(30px);
-        background: var(--background);
-        transition: opacity 0.5s;
+    .info-table th {
+        background: var(--header-bg);
+        color: var(--text);
+        font-weight: 600;
+        padding: 10px;
+        border: 1px solid var(--border);
+        text-align: center;
     }
 
-.card-info {
-    background: #ffffff;
-    color: #181818;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    border-radius: 0.8rem;
-    padding: 20px;
-    text-align: center;
-    font-size: 1.2rem;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
-    transition: color 0.5s ease;
-}
-
-
-.card .title {
-    font-weight: bold;
-    letter-spacing: 0.05em;
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-}
-
-.card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
-}
-
-    .card:hover::after {
-        opacity: 0;
-    }
-
-    .card:hover .card-info {
-        color: rgba(42,123,155,1);
-        transition: color 0.5s ease;
+    .info-table td {
+        padding: 10px;
+        border: 1px solid var(--border);
+        text-align: center;
     }

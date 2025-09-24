@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿
+using System;
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace WebInventoryControl
 {
-    public partial class Inicio : System.Web.UI.Page
+    public partial class Inicio : Page
     {
+
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            
         }
+
+        
     }
 }
