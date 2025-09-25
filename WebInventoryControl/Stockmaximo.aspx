@@ -75,7 +75,7 @@
             </tr>
           </thead>
           <tbody id="stock-body">
-            <!-- Se llena dinámicamente -->
+           
           </tbody>
         </table>
       </div>
@@ -85,8 +85,8 @@
 
   <script>
       (function () {
-          // ========= Config =========
-          const API_URL = 'https://localhost:7059/api/Stock/stock_tabla'; // Ajusta si tu endpoint es distinto
+          
+          const API_URL = 'https://localhost:7059/api/Stock/stock_tabla'; 
 
           const $body = document.getElementById('stock-body');
           const $q = document.getElementById('q');
@@ -97,7 +97,7 @@
 
           let _rowsCache = [];
 
-          // ========= Utils =========
+
           const toNumber = (v) => {
               if (v === null || v === undefined) return 0;
               const n = Number(String(v).toString().replace(/[^\d.\-]/g, ''));
@@ -133,7 +133,7 @@
               const frag = document.createDocumentFragment();
 
               data.forEach(item => {
-                  // Campos tolerantes a variantes
+
                   const codigo = pick(item, ['Codigo_Articulo', 'codigo_Articulo', 'Codigo', 'codigo']);
                   const descripcion = pick(item, ['Descripcion_Articulo', 'descripcion_Articulo', 'Descripcion', 'descripcion']);
                   const marca = pick(item, ['Marca_Articulo', 'marca_Articulo', 'Marca', 'marca']);
@@ -195,8 +195,6 @@
                   const categoria = pick(item, ['Categoria_Articulo', 'categoria_Articulo', 'Categoria', 'categoria']);
                   if (categoria) set.add(String(categoria));
               });
-
-              // Limpia y rellena, conservando "Todas"
               $cat.innerHTML = '<option value="">Todas</option>';
               [...set].sort((a, b) => a.localeCompare(b, 'es')).forEach(cat => {
                   const opt = document.createElement('option');
@@ -258,13 +256,10 @@
             </tr>`;
               }
           }
-
-          // ========= Eventos =========
           [$q, $cat, $est].forEach(el => el && el.addEventListener('input', applyFilter));
           $btnPrint?.addEventListener('click', () => window.print());
           $btnCSV?.addEventListener('click', toCSV);
 
-          // ========= Init =========
           loadData();
       })();
   </script>
