@@ -3,75 +3,66 @@
     AutoEventWireup="true"
     Inherits="System.Web.UI.Page" %>
 
-<asp:Content ID="HeadProveedores" ContentPlaceHolderID="HeadContent" runat="server">
+<asp:Content ID="HeadProvedores" ContentPlaceHolderID="HeadContent" runat="server">
+  <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="<%= ResolveUrl("~/Content/pages/provedores.css") %>" rel="stylesheet" />
-
-  <style>
-    .top-tabs {
-      display:flex; align-items:center; gap:.75rem;
-    }
-    .top-tabs .title {
-      font-weight:600; font-size:1.1rem;
-    }
-
-    .radio-inputs {
-      display:inline-flex; gap:.25rem; padding:.35rem;
-      border-radius:14px; background:#d7ded9;
-      box-shadow:0 2px 6px rgba(0,0,0,.08) inset, 0 1px 2px rgba(0,0,0,.06);
-    }
-    .radio-inputs .radio { position:relative; }
-    .radio-inputs .radio input { display:none; }
-
-    .radio-inputs .radio .name{
-      display:inline-block; padding:.45rem 1rem; border-radius:10px;
-      font-size:.95rem; font-weight:500; color:#2e2e2e; cursor:pointer;
-      transition:all .2s ease;
-    }
-    .radio-inputs .radio .name:hover { background:#c7d0cb; }
-
-    .radio-inputs .radio input:checked + .name{
-      color:#fff; box-shadow:0 2px 6px rgba(0,0,0,.12);
-      background:linear-gradient(135deg,#3bb78f 0%, #0bab64 100%);
-    }
-
-
-    .mode-badge{
-      font-size:.85rem; padding:.25rem .5rem; border-radius:999px;
-      background:#eef7f1; color:#136a3b; border:1px solid #cfe9db;
-      display:inline-flex; align-items:center; gap:.4rem;
-    }
-    .mode-badge .dot{
-      width:.5rem;height:.5rem;border-radius:999px;background:#18a166;display:inline-block;
-    }
-    .tidy tr.selected { outline:2px solid #0bab64; background: #e9faf2; }
-  </style>
+  <!-- CSS real (una sola “e”) + cache-buster -->
+  <link href="<%= ResolveUrl("~/Content/pages/provedores.css?v=6") %>" rel="stylesheet" />
 </asp:Content>
 
-<asp:Content ID="MainProveedores" ContentPlaceHolderID="MainContent" runat="server">
+<asp:Content ID="MainProvedores" ContentPlaceHolderID="MainContent" runat="server">
   <div class="wrap">
+
+    <!-- ===== Header ===== -->
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <div class="top-tabs">
           <div class="title">Proveedores</div>
           <span id="modeChip" class="mode-badge" title="Modo actual">
-            <span class="dot"></span> <b>Registrar</b>
+            <span class="dot"></span> <b>—</b>
           </span>
         </div>
-
-
-        <div class="radio-inputs" id="modeRadios">
-          <label class="radio">
-            <input type="radio" name="modo" value="registrar" checked />
-            <span class="name">Registrar</span>
-          </label>
-          <label class="radio">
-            <input type="radio" name="modo" value="actualizar" />
-            <span class="name">Actualizar</span>
-          </label>
+        <div class="actions">
+          <button id="btnOpenRegistrar" type="button" class="btn-ghost">Registrar</button>
+          <button id="btnOpenActualizar" type="button" class="btn-ghost alt" title="Actualizar proveedor seleccionado">Actualizar</button>
         </div>
       </div>
+    </div>
 
+    <!-- ===== Card superior: FORM (oculto por defecto) ===== -->
+    <section id="formPane" class="card form-pane hidden" aria-live="polite">
+      <div class="form-head">
+        <h6 id="formTitle" class="m-0">Formulario</h6>
+        <button id="btnClosePane" type="button" class="icon-btn" title="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form id="provForm" novalidate autocomplete="off">
+        <input type="hidden" id="fldId" />
+        <div class="grid">
+          <label class="f"><span>Nombre</span><input id="fldNombre" class="input" required /></label>
+          <label class="f"><span>Dirección</span><input id="fldDireccion" class="input" /></label>
+          <label class="f"><span>Ciudad</span><input id="fldCiudad" class="input" /></label>
+          <label class="f"><span>Estado / Provincia</span><input id="fldEstado" class="input" /></label>
+          <label class="f"><span>Código Postal</span><input id="fldCP" class="input" /></label>
+          <label class="f"><span>País</span><input id="fldPais" class="input" /></label>
+          <label class="f"><span>Teléfono</span><input id="fldTel" class="input" /></label>
+        </div>
+        <div class="form-actions">
+          <button id="btnSubmit" type="button" class="btn">Guardar</button>
+          <button id="btnReset" type="button" class="btn soft">Limpiar</button>
+        </div>
+      </form>
+
+      <p id="hintSeleccion" class="hint hidden">Selecciona un proveedor en la tabla para actualizar.</p>
+    </section>
+
+    <!-- ===== Card inferior: BUSCADOR + TABLA ===== -->
+    <div class="card">
       <div class="card-body">
         <div class="toolbar">
           <input id="txtBuscar" type="text" class="input" placeholder="Buscar por nombre, ciudad, estado, país o teléfono…" />
@@ -98,123 +89,191 @@
         </div>
       </div>
     </div>
+
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
   <script>
-      const API_URL = 'https://localhost:7059/api/proveedores/Proveedores_tabla';
+      // ===== Endpoints de TU API =====
+      const BASE = 'https://localhost:7059/api/proveedores';
+      const API_GET = BASE + '/Proveedores_tabla';
+      const API_POST = BASE + '/registrar';
+      const API_PUT = BASE + '/actualizar';   // se usa /actualizar/{id}
 
+      // ===== Estado =====
       let _cacheProveedores = [];
-      let currentMode = 'registrar';   // registrar | actualizar
+      let currentMode = null;    // 'registrar' | 'actualizar'
       let selectedId = null;
 
-      function pick(item, variants, autoRegex) {
-          for (const key of variants) {
-              if (key in item && item[key] != null) return item[key];
-              const found = Object.keys(item).find(k => k.toLowerCase() === key.toLowerCase());
-              if (found && item[found] != null) return item[found];
+      // ===== Utils =====
+      const $tbody = () => $('#tbodyProveedores');
+      const $pane = () => $('#formPane');
+
+      function setMode(mode) {
+          currentMode = mode;
+          $('#modeChip b').text(mode ? (mode === 'registrar' ? 'Registrar' : 'Actualizar') : '—');
+      }
+      function openPane(mode) {
+          setMode(mode);
+          $('#formTitle').text(mode === 'registrar' ? 'Registrar proveedor' : 'Actualizar proveedor');
+          $('#hintSeleccion').toggleClass('hidden', mode !== 'actualizar');
+          $pane().removeClass('hidden');
+          if (mode === 'registrar') {
+              clearForm();
+              selectedId = null;
+              $('#tbodyProveedores tr').removeClass('selected');
+          } else if (mode === 'actualizar') {
+              if (selectedId) fillFormFromRow(selectedId);
+              else { clearForm(); }
+          }
+      }
+      function closePane() { $pane().addClass('hidden'); setMode(null); }
+
+      function pick(obj, keys, autoRegex) {
+          for (const k of keys) {
+              if (k in obj && obj[k] != null) return obj[k];
+              const f = Object.keys(obj).find(x => x.toLowerCase() === k.toLowerCase());
+              if (f && obj[f] != null) return obj[f];
           }
           if (autoRegex) {
-              const k = Object.keys(item).find(k => autoRegex.test(k.toLowerCase()));
-              if (k && item[k] != null) return item[k];
+              const k = Object.keys(obj).find(x => autoRegex.test(x.toLowerCase()));
+              if (k && obj[k] != null) return obj[k];
           }
           return '';
       }
 
       function pintarTabla(rows) {
-          const $tbody = $('#tbodyProveedores');
-          $tbody.empty();
-
-          if (!Array.isArray(rows) || rows.length === 0) {
-              $tbody.html('<tr><td colspan="8" class="text-center">Sin resultados.</td></tr>');
-              return;
+          const $t = $tbody(); $t.empty();
+          if (!Array.isArray(rows) || !rows.length) {
+              $t.html('<tr><td colspan="8" class="text-center">Sin resultados.</td></tr>'); return;
           }
-
           rows.forEach(item => {
-              const ID_Proveedor = pick(item,
-                  ['ID_Proveedor', 'Id_Proveedor', 'id_Proveedor', 'id_proveedor', 'IdProveedor', 'ProveedorID', 'Proveedor_Id', 'Id', 'ID'],
-                  /(^id.*proveedor$)|(^id$)|(^proveedor.*id$)/i
-              );
-              const Nombre = pick(item, ['Nombre_Proveedor', 'nombre_Proveedor', 'Nombre', 'nombre']);
-              const Direccion = pick(item, ['Direccion', 'direccion', 'Dirección', 'dirección']);
-              const Ciudad = pick(item, ['Ciudad', 'ciudad']);
-              const State_Prov = pick(item, ['State_Prov', 'state_Prov', 'Estado', 'estado', 'Estado_Provincia', 'estado_provincia']);
-              const Codigo_Postal = pick(item, ['Codigo_Postal', 'codigo_Postal', 'CP', 'cp', 'CodigoPostal', 'codigoPostal']);
-              const Pais = pick(item, ['Pais', 'pais', 'País', 'país']);
-              const Telefono = pick(item, ['Telefono', 'telefono', 'Tel', 'tel']);
-
-              const row = `
-          <tr data-id="${ID_Proveedor}">
-            <td class="id-cell">${ID_Proveedor}</td>
-            <td>${Nombre}</td>
-            <td>${Direccion}</td>
-            <td>${Ciudad}</td>
-            <td>${State_Prov}</td>
-            <td>${Codigo_Postal}</td>
-            <td>${Pais}</td>
-            <td>${Telefono}</td>
-          </tr>`;
-              $tbody.append(row);
+              const ID_Proveedor = pick(item, ['ID_Proveedor', 'Id_Proveedor', 'id_proveedor', 'IdProveedor', 'ProveedorID', 'Id', 'ID'],
+                  /(^id.*proveedor$)|(^id$)|(^proveedor.*id$)/i);
+              const Nombre = pick(item, ['Nombre_Proveedor', 'Nombre', 'nombre']);
+              const Direccion = pick(item, ['Direccion', 'Dirección', 'direccion']);
+              const Ciudad = pick(item, ['Ciudad']);
+              const Estado = pick(item, ['State_Prov', 'Estado', 'Estado_Provincia']);
+              const CP = pick(item, ['Codigo_Postal', 'CP', 'CodigoPostal']);
+              const Pais = pick(item, ['Pais', 'País']);
+              const Tel = pick(item, ['Telefono', 'Tel']);
+              $t.append(`<tr data-id="${ID_Proveedor}">
+          <td class="id-cell">${ID_Proveedor}</td>
+          <td>${Nombre}</td><td>${Direccion}</td><td>${Ciudad}</td>
+          <td>${Estado}</td><td>${CP}</td><td>${Pais}</td><td>${Tel}</td>
+        </tr>`);
           });
       }
 
       function cargarProveedores() {
-          const $tbody = $('#tbodyProveedores');
-          $tbody.html('<tr><td colspan="8" class="text-center">Cargando…</td></tr>');
-
+          $tbody().html('<tr><td colspan="8" class="text-center">Cargando…</td></tr>');
           $.ajax({
-              url: API_URL,
+              url: API_GET,
               method: 'GET',
-              success: function (data) {
+              success: (data) => {
                   _cacheProveedores = Array.isArray(data) ? data : (Array.isArray(data?.datos) ? data.datos : []);
-                  if (_cacheProveedores.length) console.log('Ejemplo proveedor:', _cacheProveedores[0]);
                   pintarTabla(_cacheProveedores);
               },
-              error: function (xhr) {
-                  $('#tbodyProveedores').html(
-                      '<tr><td colspan="8" class="text-center text-danger">Error al cargar datos.</td></tr>'
-                  );
-                  console.error('Error API proveedores:', xhr?.status, xhr?.responseText);
+              error: (xhr) => {
+                  $tbody().html('<tr><td colspan="8" class="text-center text-danger">Error al cargar datos.</td></tr>');
+                  console.error('API GET error:', xhr?.status, xhr?.responseText);
               }
           });
       }
 
-      function normalizarTexto(t) {
-          return (t ?? '').toString().toLowerCase().trim();
-      }
-
+      function normalizar(t) { return (t ?? '').toString().toLowerCase().trim(); }
       function filtrar() {
-          const q = normalizarTexto($('#txtBuscar').val());
+          const q = normalizar($('#txtBuscar').val());
           if (!q) { pintarTabla(_cacheProveedores); return; }
-
-          const filtrados = _cacheProveedores.filter(item => {
-              const id = normalizarTexto(pick(item,
-                  ['ID_Proveedor', 'Id_Proveedor', 'id_proveedor', 'IdProveedor', 'ProveedorID', 'Id', 'ID'],
-                  /(^id.*proveedor$)|(^id$)|(^proveedor.*id$)/i
-              ));
-              const nombre = normalizarTexto(pick(item, ['Nombre_Proveedor', 'Nombre']));
-              const ciudad = normalizarTexto(pick(item, ['Ciudad']));
-              const estado = normalizarTexto(pick(item, ['State_Prov', 'Estado']));
-              const pais = normalizarTexto(pick(item, ['Pais']));
-              const telefono = normalizarTexto(pick(item, ['Telefono']));
-
-              return (
-                  id.includes(q) || nombre.includes(q) || ciudad.includes(q) ||
-                  estado.includes(q) || pais.includes(q) || telefono.includes(q)
-              );
+          const r = _cacheProveedores.filter(item => {
+              const id = normalizar(pick(item, ['ID_Proveedor', 'Id', 'ID']));
+              const n = normalizar(pick(item, ['Nombre_Proveedor', 'Nombre']));
+              const c = normalizar(pick(item, ['Ciudad']));
+              const e = normalizar(pick(item, ['State_Prov', 'Estado']));
+              const p = normalizar(pick(item, ['Pais']));
+              const t = normalizar(pick(item, ['Telefono']));
+              return id.includes(q) || n.includes(q) || c.includes(q) || e.includes(q) || p.includes(q) || t.includes(q);
           });
-          pintarTabla(filtrados);
-      }
-      function updateModeBadge() {
-          const text = (currentMode === 'registrar') ? 'Registrar' : 'Actualizar';
-          $('#modeChip b').text(text);
+          pintarTabla(r);
       }
 
+      function fillFormFromRow(idBuscado) {
+          const it = _cacheProveedores.find(x => {
+              const id = pick(x, ['ID_Proveedor', 'Id_Proveedor', 'id_proveedor', 'IdProveedor', 'ProveedorID', 'Id', 'ID'],
+                  /(^id.*proveedor$)|(^id$)|(^proveedor.*id$)/i);
+              return String(id) === String(idBuscado);
+          });
+          if (!it) return;
+          $('#fldId').val(idBuscado);
+          $('#fldNombre').val(pick(it, ['Nombre_Proveedor', 'Nombre']));
+          $('#fldDireccion').val(pick(it, ['Direccion', 'Dirección']));
+          $('#fldCiudad').val(pick(it, ['Ciudad']));
+          $('#fldEstado').val(pick(it, ['State_Prov', 'Estado', 'Estado_Provincia']));
+          $('#fldCP').val(pick(it, ['Codigo_Postal', 'CP', 'CodigoPostal']));
+          $('#fldPais').val(pick(it, ['Pais', 'País']));
+          $('#fldTel').val(pick(it, ['Telefono', 'Tel']));
+      }
+
+      function payloadFromForm() {
+          return {
+              ID_Proveedor: $('#fldId').val() || null,
+              Nombre_Proveedor: $('#fldNombre').val(),
+              Direccion: $('#fldDireccion').val(),
+              Ciudad: $('#fldCiudad').val(),
+              State_Prov: $('#fldEstado').val(),
+              Codigo_Postal: $('#fldCP').val(),
+              Pais: $('#fldPais').val(),
+              Telefono: $('#fldTel').val()
+          };
+      }
+
+      // ===== Limpieza =====
+      function clearForm() {
+          const $f = $('#provForm');
+          if ($f.length && $f[0].reset) $f[0].reset();
+          $f.find('input').each(function () { $(this).val(''); });
+          $('#fldId').val('');
+      }
+
+      // ===== Validar / Guardar =====
+      function validar() {
+          const nombre = $('#fldNombre').val().trim();
+          if (!nombre) { alert('El nombre es obligatorio.'); $('#fldNombre').focus(); return false; }
+          return true;
+      }
+
+      function guardar() {
+          if (!validar()) return;
+          const body = payloadFromForm();
+
+          if (currentMode === 'registrar') {
+              $.ajax({
+                  url: API_POST,
+                  method: 'POST',
+                  contentType: 'application/json; charset=utf-8',
+                  data: JSON.stringify(body),
+                  success: () => { alert('Proveedor registrado.'); closePane(); cargarProveedores(); },
+                  error: (xhr) => { console.error('POST error', xhr?.status, xhr?.responseText); alert('Error al registrar.'); }
+              });
+          } else if (currentMode === 'actualizar') {
+              const id = $('#fldId').val() || selectedId;
+              if (!id) { alert('Selecciona un proveedor.'); return; }
+              $.ajax({
+                  url: API_PUT + '/' + encodeURIComponent(id), // /actualizar/{id}
+                  method: 'PUT',
+                  contentType: 'application/json; charset=utf-8',
+                  data: JSON.stringify(body),
+                  success: () => { alert('Proveedor actualizado.'); closePane(); cargarProveedores(); },
+                  error: (xhr) => { console.error('PUT error', xhr?.status, xhr?.responseText); alert('Error al actualizar.'); }
+              });
+          }
+      }
+
+      // ===== Init =====
       $(function () {
           cargarProveedores();
 
-          // Buscar / Limpiar
+          // Buscar / Limpiar (tabla)
           $('#btnBuscar').on('click', filtrar);
           $('#txtBuscar').on('keypress', e => { if (e.which === 13) filtrar(); });
           $('#btnLimpiar').on('click', function () {
@@ -223,24 +282,27 @@
               $('#txtBuscar').focus();
           });
 
-          $('#modeRadios input[name="modo"]').on('change', function () {
-              currentMode = this.value;           // 'registrar' | 'actualizar'
-              updateModeBadge();
-              selectedId = null;
-              $('#tbodyProveedores tr').removeClass('selected');
-              console.log('Modo actual:', currentMode);
-          });
+          // Abrir / cerrar pane
+          $('#btnOpenRegistrar').on('click', () => openPane('registrar'));
+          $('#btnOpenActualizar').on('click', () => openPane('actualizar'));
+          $('#btnClosePane').on('click', closePane);
 
+          // Selección de fila (para actualizar)
           $('#tbodyProveedores').on('click', 'tr', function () {
-              if (currentMode !== 'actualizar') return;
-
               $('#tbodyProveedores tr').removeClass('selected');
               $(this).addClass('selected');
-
               selectedId = $(this).data('id');
-              console.log('Fila seleccionada (para actualizar):', selectedId);
+              if (currentMode === 'actualizar' && !$pane().hasClass('hidden')) {
+                  fillFormFromRow(selectedId);
+              }
+          });
 
-              $('#modeChip').attr('title', 'ID seleccionado: ' + selectedId);
+          // Guardar / Limpiar (formulario)
+          $('#btnSubmit').on('click', guardar);
+          $('#btnReset').on('click', function (e) {
+              e.preventDefault();
+              clearForm(); // Si quieres re-prellenar en actualizar, descomenta:
+              // if (currentMode === 'actualizar' && selectedId) fillFormFromRow(selectedId);
           });
       });
   </script>

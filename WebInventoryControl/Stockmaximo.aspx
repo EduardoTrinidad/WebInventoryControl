@@ -30,14 +30,14 @@
     <div class="toolbar">
       <div class="field">
         <label for="q">Buscar</label>
-        <input id="q" class="control" type="search" placeholder="Código, descripción, marca..." />
+        <input id="q" class="control" type="search" placeholder="Escribe el codigo" />
       </div>
 
       <div class="field">
         <label for="cat">Categoría</label>
         <select id="cat" class="control">
           <option value="">Todas</option>
-          <!-- Se llenará dinámicamente con categorías detectadas -->
+      
         </select>
       </div>
 
