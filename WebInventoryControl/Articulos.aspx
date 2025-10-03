@@ -6,328 +6,601 @@
 
 <asp:Content ID="HeadArticulos" ContentPlaceHolderID="HeadContent" runat="server">
   <link rel="stylesheet" href="<%= ResolveUrl("~/Content/pages/articulo.css") %>" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  <style>
+    .card{margin-top:1rem;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.06)}
+    .card-h{display:flex;gap:.8rem;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid rgba(0,0,0,.06)}
+    .badge{background:#0ea5e9;color:#fff;font-weight:700;padding:.25rem .6rem;border-radius:999px;letter-spacing:.5px}
+    .card-b{padding:1rem 1.25rem}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .field label{display:block;font-size:.9rem;margin-bottom:.25rem;color:#0f172a}
+    .control{width:100%;padding:.6rem .7rem;border-radius:10px;border:1px solid rgba(0,0,0,.12);background:#f8fafc}
+    .value{display:block;width:100%;padding:.6rem .7rem;border-radius:10px;border:1px dashed rgba(0,0,0,.12);background:#fafafa;font-weight:600;color:#0f172a;min-height:42px}
+    .muted{color:#94a3b8;font-weight:500}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:12px;padding:.65rem 1rem;cursor:pointer}
+    .btn-primary{background:#0f3f66;color:#fff}
+    .btn-secondary{color:#0f172a;background:#fff;border:1px solid rgba(0,0,0,.18)}
+    .btn-outline{background:#fff;border:1px solid #0f3f66;color:#0f3f66}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    #hint,#movHint{color:#64748b}
+    .table-wrap{background:#fff;border-top:1px solid var(--card-border, rgba(15,23,42,.10))}
+    .table-scroll{overflow:auto;max-height:360px}
+    .users-table{width:100%;border-collapse:separate;border-spacing:0}
+    .users-table thead th{position:sticky;top:0;z-index:2;background:var(--accent-a,#2A7B9B);color:#fff;text-align:left;padding:.65rem .8rem}
+    .users-table tbody td{padding:.6rem .8rem;border-bottom:1px solid var(--card-border, rgba(15,23,42,.10))}
+  </style>
 </asp:Content>
 
 <asp:Content ID="MainArticulos" ContentPlaceHolderID="MainContent" runat="server">
 
-  <div class="radio-inputs" id="modeRadios">
-    <label class="radio">
-      <input type="radio" name="modo" value="buscar" checked />
-      <span class="name">Buscar usuario</span>
-    </label>
-    <label class="radio">
-      <input type="radio" name="modo" value="prestar" />
-      <span class="name">Prestar herramienta</span>
-    </label>
-  </div>
-
-  <div class="card-container">
-
-    <div class="articulo-card" id="card-buscar">
-      <div class="articulo-header">
-        <div class="articulo-badge">JPH</div>
-        <div>
-          <h3 class="articulo-title">Buscar empleado</h3>
-          <p class="articulo-sub">Consulta por <strong>número de reloj</strong></p>
-        </div>
-      </div>
-
-      <div class="articulo-body">
-        <div class="form-grid">
-          <div class="field" style="grid-column:1/-1;">
-            <label for="reloj">Número de reloj</label>
-            <input id="reloj" class="control" type="search" inputmode="numeric" placeholder="Ej. 00123" />
-          </div>
-
-          <div class="field">
-            <label>Nombre</label>
-            <input id="outNombre" class="control" type="text" placeholder="—" disabled />
-          </div>
-          <div class="field">
-            <label>Departamento</label>
-            <input id="outDepto" class="control" type="text" placeholder="—" disabled />
-          </div>
-          <div class="field">
-            <label>Puesto</label>
-            <input id="outPuesto" class="control" type="text" placeholder="—" disabled />
-          </div>
-          <div class="field">
-            <label>Turno</label>
-            <input id="outTurno" class="control" type="text" placeholder="—" disabled />
-          </div>
-        </div>
-
-        <div class="results" aria-label="Resultado (mock)">
-          <div class="thumb" aria-hidden="true"></div>
-          <div>
-            <div style="font-weight:700;">Resultado</div>
-            <div class="articulo-sub">Muestra simulada al buscar por reloj</div>
-          </div>
-          <button type="button" class="btn btn-secondary" id="go-prestar">Prestar</button>
-        </div>
+  <!-- ===== CARD: Salida de artículo ===== -->
+  <div class="card">
+    <div class="card-h">
+      <div class="badge">OUT</div>
+      <div>
+        <h3 style="margin:0">Salida de artículo</h3>
+        <p style="margin:.2rem 0 0;color:#6b7280">
+          Busca por separado el <strong>artículo</strong> y el <strong>responsable</strong>. 
+          Luego registra la salida.
+        </p>
       </div>
     </div>
 
-    <div class="articulo-card is-hidden" id="card-prestar" aria-hidden="true">
-      <div class="articulo-header">
-        <div class="articulo-badge">JPH</div>
-        <div>
-          <h3 class="articulo-title">Préstamo de herramienta</h3>
-          <p class="articulo-sub">Registra un préstamo rápido</p>
+    <div class="card-b">
+      <!-- Buscar Artículo -->
+      <div class="grid" style="grid-column:1/-1;margin-bottom:.25rem">
+        <div class="field">
+          <label for="codigoArticulo">Código de artículo</label>
+          <input id="codigoArticulo" class="control" type="search" placeholder="Ej. A-0001 / t03" />
+        </div>
+        <div class="field" style="display:flex;align-items:flex-end">
+          <button id="btnBuscarArticulo" class="btn btn-outline" type="button">Buscar artículo</button>
         </div>
       </div>
 
-      <div class="articulo-body">
-        <div class="form-grid">
-          <div class="field">
-            <label for="relojPrestamo"># Reloj</label>
-            <input id="relojPrestamo" class="control" type="text" placeholder="Ej. 00123" />
-          </div>
-          <div class="field">
-            <label for="nombrePrestamo">Nombre</label>
-            <input id="nombrePrestamo" class="control" type="text" placeholder="Nombre del empleado" />
-          </div>
-          <div class="field">
-            <label for="deptoPrestamo">Departamento</label>
-            <input id="deptoPrestamo" class="control" type="text" placeholder="Departamento" />
-          </div>
-          <div class="field">
-            <label for="toolId">ID/Parte herramienta</label>
-            <input id="toolId" class="control" type="text" placeholder="Ej. TL-00045 o ABC-123" />
-          </div>
-          <div class="field" style="grid-column:1/-1;">
-            <label for="toolName">Nombre de la herramienta</label>
-            <input id="toolName" class="control" type="text" placeholder="Desarmador Philips / Taladro, etc." />
-          </div>
-          <div class="field">
-            <label for="fecha">Fecha</label>
-            <input id="fecha" class="control" type="date" />
-          </div>
-          <div class="field">
-            <label for="hora">Hora</label>
-            <input id="hora" class="control" type="time" />
-          </div>
-          <div class="field" style="grid-column:1/-1;">
-            <label for="comentarios">Comentarios</label>
-            <input id="comentarios" class="control" type="text" placeholder="Observaciones (opcional)" />
-          </div>
+      <div class="grid" style="grid-column:1/-1;margin-bottom:.5rem">
+        <div class="field">
+          <label>Código</label>
+          <span id="lblCodigo" class="value muted">—</span>
         </div>
+        <div class="field">
+          <label>Nombre / Nº Parte</label>
+          <span id="lblNombreParte" class="value muted">—</span>
+        </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>Descripción</label>
+          <span id="lblDescripcion" class="value muted">—</span>
+        </div>
+        <div class="field">
+          <label>Stock actual</label>
+          <span id="lblStock" class="value muted">—</span>
+        </div>
+        <div class="field">
+          <label>Unidad</label>
+          <span id="lblUnidad" class="value muted">—</span>
+        </div>
+      </div>
 
-        <div class="actions">
-          <button type="button" class="btn btn-secondary" id="btn-cancel">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="btn-registrar">Registrar préstamo</button>
+      <hr />
+
+      <!-- Buscar Responsable -->
+      <div class="grid" style="grid-column:1/-1;margin-bottom:.25rem">
+        <div class="field">
+          <label for="responsableBuscar">Responsable</label>
+          <input id="responsableBuscar"
+                 class="control"
+                 type="search"
+                 list="dlResponsables"
+                 placeholder="Escribe el nombre y selecciona" />
+          <datalist id="dlResponsables"></datalist>
         </div>
+        <!-- Campo oculto para guardar el # de reloj asociado -->
+        <input id="relojEmpleado" type="hidden" />
+      </div>
+
+      <div class="grid" style="grid-column:1/-1;">
+        <div class="field">
+          <label>Nombre</label>
+          <span id="lblEmpleado" class="value muted">—</span>
+        </div>
+        <div class="field">
+          <label>Departamento</label>
+          <span id="lblDepto" class="value muted">—</span>
+        </div>
+        <div class="field">
+          <label>Puesto</label>
+          <span id="lblPuesto" class="value muted">—</span>
+        </div>
+      </div>
+
+      <hr />
+
+      <!-- Datos de salida -->
+      <div class="grid" style="grid-column:1/-1;">
+        <div class="field">
+          <label for="cantSalida">Cantidad a salir</label>
+          <input id="cantSalida" class="control" type="number" min="1" placeholder="Ej. 10" />
+        </div>
+        <div class="field">
+          <label for="fechaSalida">Fecha de salida</label>
+          <input id="fechaSalida" class="control" type="date" />
+        </div>
+        <div class="field">
+          <label for="equipo">Equipo (opcional)</label>
+          <input id="equipo" class="control" type="text" placeholder="Ej. Taladro, Juego llaves..." />
+        </div>
+        <div class="field">
+          <label for="responsable">Responsable (opcional)</label>
+          <input id="responsable" class="control" type="text" placeholder="Nombre de quien entrega" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:.5rem">
+        <button id="btnRegistrar" class="btn btn-primary" type="button" disabled>Registrar salida</button>
+        <span id="hint"></span>
       </div>
     </div>
   </div>
 
-  <section class="analytics" aria-label="Analítica de Toolcrib">
-    <h4>Indicadores</h4>
-
-    <div class="kpis">
-      <div class="kpi" aria-live="polite">
-        <div class="label">Herramienta más usada</div>
-        <div class="value" id="kpi-top-tool">—</div>
-        <div class="trend up" id="kpi-top-tool-trend">+0% este mes</div>
-      </div>
-      <div class="kpi" aria-live="polite">
-        <div class="label">Quién solicita más</div>
-        <div class="value" id="kpi-top-user">—</div>
-        <div class="trend up" id="kpi-top-user-trend">+0% solicitudes</div>
-      </div>
-      <div class="kpi" aria-live="polite">
-        <div class="label">Departamento que más pide</div>
-        <div class="value" id="kpi-top-dept">—</div>
-        <div class="trend up" id="kpi-top-dept-trend">+0%</div>
+  <!-- ===== CARD: Movimientos ===== -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-h">
+      <div class="badge">LOG</div>
+      <div>
+        <h3 style="margin:0">Movimientos por rango</h3>
+        <p style="margin:.2rem 0 0;color:#6b7280">
+          Filtra por Código, Responsable y rango de fechas.
+        </p>
       </div>
     </div>
 
-    <div class="users-toolbar">
-      <div class="search" role="search">
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 21l-4.3-4.3m1.6-5.1A7.2 7.2 0 1 1 3 11.6a7.2 7.2 0 0 1 15.3 0Z"/></svg>
-        <input type="search" placeholder="Buscar usuario (nombre, reloj, área)…" aria-label="Buscar usuario" />
+    <div class="card-b">
+      <div class="grid" style="grid-column:1/-1;margin-bottom:.5rem">
+        <div class="field">
+          <label for="fCodigo">Código de artículo (opcional)</label>
+          <input id="fCodigo" class="control" type="search" placeholder="Ej. A-0001 / t03" />
+        </div>
+        <div class="field">
+          <label for="fResponsable">Responsable (opcional)</label>
+          <input id="fResponsable" class="control" type="search" placeholder="Nombre del responsable" />
+        </div>
+        <div class="field">
+          <label for="fDel">Fecha inicial</label>
+          <input id="fDel" class="control" type="date" />
+        </div>
+        <div class="field">
+          <label for="fAl">Fecha final</label>
+          <input id="fAl" class="control" type="date" />
+        </div>
       </div>
-      <span class="pill"><strong>Total registros:</strong> <span id="users-total">—</span></span>
+
+      <div class="actions" style="justify-content:flex-start; gap:8px; margin-bottom:12px">
+        <button id="btnFiltrar" class="btn btn-primary" type="button">Buscar</button>
+        <button id="btnLimpiar" class="btn btn-secondary" type="button">Limpiar</button>
+        <button id="btnExcel" class="btn btn-secondary" type="button" title="Descargar Excel">Descargar Excel</button>
+        <span id="movHint" class="pill">Mostrando últimos 10</span>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table class="users-table" id="tblMovs">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Código</th>
+                <th>Responsable</th>
+                <th>Cantidad</th>
+                <th>Equipo</th>
+                <th>Entregó</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table class="users-table" role="table" aria-label="Tabla de uso (mock)">
-          <thead>
-            <tr>
-              <th># Reloj</th>
-              <th>Nombre</th>
-              <th>Área</th>
-              <th>Solicitudes</th>
-              <th>Tiempo usado (hrs)</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="users-body">
-            <tr><td>00123</td><td>Maria López</td><td>Producción</td><td>18</td><td>42.5</td><td><span class="badge">Activo</span></td></tr>
-            <tr><td>00456</td><td>Carlos Pérez</td><td>Mantenimiento</td><td>22</td><td>51.0</td><td><span class="badge">Activo</span></td></tr>
-            <tr><td>00789</td><td>Ana Torres</td><td>Calidad</td><td>11</td><td>25.0</td><td><span class="badge">Suspendido</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <div class="charts">
-      <div class="chart-card">
-        <div class="title">Top herramientas más solicitadas</div>
-        <canvas id="chartTopTools" height="220" aria-label="Barras herramientas" role="img"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="title">Usuarios con más solicitudes</div>
-        <canvas id="chartTopUsers" height="220" aria-label="Barras usuarios" role="img"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="title">Departamentos que más solicitan</div>
-        <canvas id="chartTopDepts" height="220" aria-label="Barras departamentos" role="img"></canvas>
-      </div>
-    </div>
-  </section>
+ <script>
+     (() => {
+         'use strict';
 
-  <script>
-      (function () {
-          const radios = document.querySelectorAll('input[name="modo"]');
-          const cardBuscar = document.getElementById('card-buscar');
-          const cardPrestar = document.getElementById('card-prestar');
-          const goPrestar = document.getElementById('go-prestar');
+         const API = "https://localhost:7059";
 
-          function show(which) {
-              const showEl = which === 'buscar' ? cardBuscar : cardPrestar;
-              const hideEl = which === 'buscar' ? cardPrestar : cardBuscar;
-              hideEl.classList.add('is-hidden'); hideEl.setAttribute('aria-hidden', 'true');
-              showEl.classList.remove('is-hidden'); showEl.removeAttribute('aria-hidden');
-          }
-          radios.forEach(r => r.addEventListener('change', e => show(e.target.value)));
-          if (goPrestar) {
-              goPrestar.addEventListener('click', () => {
-                  document.querySelector('input[name="modo"][value="prestar"]').checked = true;
-                  show('prestar');
-              });
-          }
+         const $codigo = document.getElementById('codigoArticulo');
+         const $cant = document.getElementById('cantSalida');
+         const $fecha = document.getElementById('fechaSalida');
+         const $equipo = document.getElementById('equipo');
+         const $resp = document.getElementById('responsable');
 
-          const users = [
-              { reloj: "00123", nombre: "Maria López", area: "Producción", puesto: "Operadora", turno: "A", solicitudes: 18, horas: 42.5 },
-              { reloj: "00456", nombre: "Carlos Pérez", area: "Mantenimiento", puesto: "Técnico", turno: "B", solicitudes: 22, horas: 51.0 },
-              { reloj: "00789", nombre: "Ana Torres", area: "Calidad", puesto: "Inspectora", turno: "A", solicitudes: 11, horas: 25.0 },
-              { reloj: "00234", nombre: "Luis Díaz", area: "Producción", puesto: "Operador", turno: "C", solicitudes: 26, horas: 63.2 },
-              { reloj: "00999", nombre: "Karla Ruiz", area: "Toolcrib", puesto: "Almacén", turno: "B", solicitudes: 17, horas: 38.7 }
-          ];
-          const tools = [
-              { tool: "Desarmador Philips", times: 35, depto: "Mantenimiento" },
-              { tool: "Llave 10mm", times: 42, depto: "Producción" },
-              { tool: "Taladro", times: 27, depto: "Producción" },
-              { tool: "Multímetro", times: 18, depto: "Mantenimiento" },
-              { tool: "Pulidora", times: 14, depto: "Calidad" }
-          ];
+         const $lblCodigo = document.getElementById('lblCodigo');
+         const $lblNombreParte = document.getElementById('lblNombreParte');
+         const $lblDescripcion = document.getElementById('lblDescripcion');
+         const $lblStock = document.getElementById('lblStock');
+         const $lblUnidad = document.getElementById('lblUnidad');
 
-          const reloj = document.getElementById('reloj');
-          reloj.addEventListener('input', () => {
-              const u = users.find(x => x.reloj.startsWith(reloj.value.trim()));
-              document.getElementById('outNombre').value = u ? u.nombre : "";
-              document.getElementById('outDepto').value = u ? u.area : "";
-              document.getElementById('outPuesto').value = u ? u.puesto : "";
-              document.getElementById('outTurno').value = u ? u.turno : "";
+         const $lblEmpleado = document.getElementById('lblEmpleado');
+         const $lblDepto = document.getElementById('lblDepto');
+         const $lblPuesto = document.getElementById('lblPuesto');
 
-              if (u) {
-                  document.getElementById('relojPrestamo').value = u.reloj;
-                  document.getElementById('nombrePrestamo').value = u.nombre;
-                  document.getElementById('deptoPrestamo').value = u.area;
-              }
-          });
+         const $btnBA = document.getElementById('btnBuscarArticulo');
+         const $btnReg = document.getElementById('btnRegistrar');
+         const $hint = document.getElementById('hint');
 
-      
-          document.getElementById('btn-registrar').addEventListener('click', () => {
-              alert('Préstamo registrado (demo). Integra tu lógica con BD aquí.');
-          });
-          document.getElementById('btn-cancel').addEventListener('click', () => show('buscar'));
+         const $fCodigo = document.getElementById('fCodigo');
+         const $fResp = document.getElementById('fResponsable');
+         const $fDel = document.getElementById('fDel');
+         const $fAl = document.getElementById('fAl');
 
-       
-          const topUser = [...users].sort((a, b) => b.solicitudes - a.solicitudes)[0];
-          const topTool = [...tools].sort((a, b) => b.times - a.times)[0];
-          const deptCount = tools.reduce((acc, t) => { acc[t.depto] = (acc[t.depto] || 0) + t.times; return acc; }, {});
-          const topDept = Object.entries(deptCount).sort((a, b) => b[1] - a[1])[0];
+         const $btnFiltrar = document.getElementById('btnFiltrar');
+         const $btnLimpiar = document.getElementById('btnLimpiar');
+         const $btnExcel = document.getElementById('btnExcel');
 
-          document.getElementById('kpi-top-user').textContent = topUser ? topUser.nombre : '—';
-          document.getElementById('kpi-top-tool').textContent = topTool ? topTool.tool : '—';
-          document.getElementById('kpi-top-dept').textContent = topDept ? topDept[0] : '—';
-          document.getElementById('users-total').textContent = users.length.toString();
+         const $tbl = document.getElementById('tblMovs');
+         const $tbody = $tbl ? $tbl.querySelector('tbody') : null;
+         const $movHint = document.getElementById('movHint');
 
-          const cs = getComputedStyle(document.documentElement);
-          const gridColor = cs.getPropertyValue('--card-border').trim() || 'rgba(148,163,184,.3)';
-          const labelColor = cs.getPropertyValue('--card-fg').trim() || '#0f172a';
-          const accentA = cs.getPropertyValue('--accent-a').trim() || '#2563eb';
-          const accentB = cs.getPropertyValue('--accent-b').trim() || '#22c55e';
-          const accentC = cs.getPropertyValue('--accent-c').trim() || '#eab308';
+         const $inputResp = document.getElementById('responsableBuscar');
+         const $dlResp = document.getElementById('dlResponsables');
+         const $relojHidden = document.getElementById('relojEmpleado');
 
-          new Chart(document.getElementById('chartTopTools').getContext('2d'), {
-              type: 'bar',
-              data: {
-                  labels: tools.map(t => t.tool),
-                  datasets: [{ label: 'Solicitudes', data: tools.map(t => t.times), borderWidth: 1, backgroundColor: accentA, borderColor: accentA }]
-              },
-              options: {
-                  responsive: true,
-                  plugins: { legend: { labels: { color: labelColor } }, tooltip: { enabled: true } },
-                  scales: {
-                      x: { ticks: { color: labelColor }, grid: { color: gridColor } },
-                      y: { beginAtZero: true, ticks: { color: labelColor }, grid: { color: gridColor } }
-                  }
-              }
-          });
+         (function () {
+             if ($fecha) {
+                 const d = new Date();
+                 $fecha.value = d.toISOString().slice(0, 10);
+             }
+         })();
 
-        
-          const topUsers = [...users].sort((a, b) => b.solicitudes - a.solicitudes).slice(0, 5);
-          new Chart(document.getElementById('chartTopUsers').getContext('2d'), {
-              type: 'bar',
-              data: {
-                  labels: topUsers.map(u => u.nombre.split(' ')[0]),
-                  datasets: [{ label: 'Solicitudes', data: topUsers.map(u => u.solicitudes), borderWidth: 1, backgroundColor: accentB, borderColor: accentB }]
-              },
-              options: {
-                  responsive: true,
-                  plugins: { legend: { labels: { color: labelColor } }, tooltip: { enabled: true } },
-                  scales: {
-                      x: { ticks: { color: labelColor }, grid: { color: gridColor } },
-                      y: { beginAtZero: true, ticks: { color: labelColor }, grid: { color: gridColor } }
-                  }
-              }
-          });
+         const canon = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+         const pick = (obj, keys) => {
+             if (!obj) return null;
+             const map = new Map();
+             Object.keys(obj).forEach(k => map.set(canon(k), obj[k]));
+             for (const wanted of keys) {
+                 const v = map.get(canon(wanted));
+                 if (v !== undefined && v !== null && v !== "") return v;
+             }
+             return null;
+         };
 
-          
-          const deptLabels = Object.keys(deptCount);
-          const deptValues = Object.values(deptCount);
-          new Chart(document.getElementById('chartTopDepts').getContext('2d'), {
-              type: 'bar',
-              data: {
-                  labels: deptLabels,
-                  datasets: [{ label: 'Solicitudes', data: deptValues, borderWidth: 1, backgroundColor: accentC, borderColor: accentC }]
-              },
-              options: {
-                  responsive: true,
-                  plugins: { legend: { labels: { color: labelColor } }, tooltip: { enabled: true } },
-                  scales: {
-                      x: { ticks: { color: labelColor }, grid: { color: gridColor } },
-                      y: { beginAtZero: true, ticks: { color: labelColor }, grid: { color: gridColor } }
-                  }
-              }
-          });
+         function normalizeArticulo(a) {
+             if (!a) return null;
+             return {
+                 Codigo_Articulo: pick(a, ["Codigo_Articulo"]),
+                 Numero_Parte_Articulo: pick(a, ["Numero_Parte_Articulo"]),
+                 Descripcion_Articulo: pick(a, ["Descripcion_Articulo"]),
+                 Stock_Actual_Articulo: pick(a, ["Stock_Actual_Articulo"]),
+                 Unidad_Medida_Articulo: pick(a, ["Unidad_Medida_Articulo"])
+             };
+         }
 
-         
-          const now = new Date();
-          document.getElementById('fecha').value = now.toISOString().slice(0, 10);
-          document.getElementById('hora').value = now.toTimeString().slice(0, 5);
-      })();
-  </script>
+         function setArticulo(a) {
+             if (a) {
+                 $lblCodigo.textContent = a.Codigo_Articulo ?? "—";
+                 $lblNombreParte.textContent = a.Numero_Parte_Articulo ?? "—";
+                 $lblDescripcion.textContent = a.Descripcion_Articulo ?? "—";
+                 $lblStock.textContent = a.Stock_Actual_Articulo ?? "—";
+                 $lblUnidad.textContent = a.Unidad_Medida_Articulo ?? "—";
+                 [$lblCodigo, $lblNombreParte, $lblDescripcion, $lblStock, $lblUnidad].forEach(el => el.classList.remove('muted'));
+             } else {
+                 [$lblCodigo, $lblNombreParte, $lblDescripcion, $lblStock, $lblUnidad].forEach(el => { el.textContent = "—"; el.classList.add('muted'); });
+             }
+             updateRegistrarEnabled();
+         }
+
+         function setEmpleadoFromSelection(nombre, depto, puesto, reloj) {
+             $lblEmpleado.textContent = nombre || "—";
+             $lblDepto.textContent = depto || "—";
+             $lblPuesto.textContent = puesto || "—";
+             [$lblEmpleado, $lblDepto, $lblPuesto].forEach(el => el.classList.remove('muted'));
+             $relojHidden.value = reloj || "";
+             updateRegistrarEnabled();
+         }
+
+         function clearEmpleado() {
+             [$lblEmpleado, $lblDepto, $lblPuesto].forEach(el => { el.textContent = "—"; el.classList.add('muted'); });
+             $relojHidden.value = "";
+             updateRegistrarEnabled();
+         }
+
+         function updateRegistrarEnabled() {
+             const ok =
+                 ($lblCodigo.textContent && $lblCodigo.textContent !== "—") &&
+                 ($lblEmpleado.textContent && $lblEmpleado.textContent !== "—") &&
+                 (Number($cant.value) > 0) &&
+                 ($relojHidden.value && $relojHidden.value.trim() !== "");
+             $btnReg.disabled = !ok;
+         }
+
+         function fmtFecha(isoLike) {
+             if (!isoLike) return "—";
+             try {
+                 const d = new Date(isoLike);
+                 if (isNaN(d.getTime())) return isoLike;
+                 const pad = n => String(n).padStart(2, '0');
+                 return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+             } catch { return isoLike; }
+         }
+
+         function normalizeMovimiento(m) {
+             return {
+                 Fecha_Salida: pick(m, ["Fecha_Salida", "Fecha"]),
+                 Codigo_Articulo: pick(m, ["Codigo_Articulo", "Codigo"]),
+                 Num_Reloj_Empleado: pick(m, ["Num_Reloj_Empleado", "Reloj", "Numero_Reloj"]),
+                 Cantidad: Number(pick(m, ["Cantidad", "Qty", "Cantidad_Salida"]) ?? 0),
+                 Equipo: pick(m, ["Equipo"]),
+                 Responsable: pick(m, ["Responsable"])
+             };
+         }
+
+         function renderRows(items) {
+             if (!$tbody) return;
+             $tbody.innerHTML = "";
+             if (!items?.length) {
+                 const tr = document.createElement('tr');
+                 const td = document.createElement('td');
+                 td.colSpan = 6;
+                 td.textContent = "Sin resultados.";
+                 tr.appendChild(td);
+                 $tbody.appendChild(tr);
+                 return;
+             }
+             for (const it of items) {
+                 const n = normalizeMovimiento(it);
+                 const tr = document.createElement('tr');
+                 tr.innerHTML = `
+        <td>${fmtFecha(n.Fecha_Salida)}</td>
+        <td>${n.Codigo_Articulo ?? "—"}</td>
+        <td>${n.Num_Reloj_Empleado ?? "—"}</td>
+        <td>${n.Cantidad ?? 0}</td>
+        <td>${n.Equipo ?? "—"}</td>
+        <td>${n.Responsable ?? "—"}</td>
+      `;
+                 $tbody.appendChild(tr);
+             }
+         }
+
+         function buildQuery() {
+             const qs = new URLSearchParams();
+             const hasRange = Boolean($fDel?.value) || Boolean($fAl?.value);
+             if ($fCodigo?.value.trim()) qs.set('codigo', $fCodigo.value.trim());
+             if ($fResp?.value.trim()) qs.set('responsable', $fResp.value.trim());
+             if ($fDel?.value) qs.set('fechaInicio', $fDel.value);
+             if ($fAl?.value) qs.set('fechaFin', $fAl.value);
+             if (!hasRange) qs.set('top', '10');
+             return qs.toString();
+         }
+
+         async function cargarMovimientos() {
+             try {
+                 if ($movHint) $movHint.textContent = "Cargando…";
+                 const qs = buildQuery();
+                 const url = `${API}/api/salida/movimientos${qs ? ('?' + qs) : ''}`;
+                 const res = await fetch(url);
+                 const data = await res.json().catch(() => []);
+                 const items = Array.isArray(data) ? data : (data.items ?? data.result ?? []);
+                 renderRows(items);
+                 const hasRange = Boolean($fDel?.value) || Boolean($fAl?.value);
+                 if ($movHint) $movHint.textContent = hasRange ? "Rango aplicado" : "Mostrando últimos 10";
+             } catch (e) {
+                 console.error(e);
+                 renderRows([]);
+                 if ($movHint) $movHint.textContent = "Error al cargar";
+             }
+         }
+
+         async function descargarExcel() {
+             try {
+                 const qs = buildQuery();
+                 const url = `${API}/api/salida/movimientos/excel${qs ? ('?' + qs) : ''}`;
+                 const res = await fetch(url);
+                 if (!res.ok) throw new Error();
+                 const blob = await res.blob();
+                 const ct = (res.headers.get('Content-Type') || '').toLowerCase();
+                 const isCsv = ct.includes('text/csv') || ct.includes('application/vnd.ms-excel');
+                 const ext = isCsv ? 'csv' : 'xlsx';
+                 const a = document.createElement('a');
+                 const href = URL.createObjectURL(blob);
+                 a.href = href;
+                 const tagDel = $fDel?.value || "";
+                 const tagAl = $fAl?.value || "";
+                 const tag = tagDel + (tagDel && tagAl ? '_' : '') + tagAl;
+                 a.download = `movimientos_${tag || new Date().toISOString().slice(0, 10)}.${ext}`;
+                 document.body.appendChild(a);
+                 a.click();
+                 a.remove();
+                 URL.revokeObjectURL(href);
+             } catch {
+                 const rows = [];
+                 const headers = ["Fecha", "Código", "# Reloj", "Cantidad", "Equipo", "Responsable"];
+                 rows.push(headers.join(','));
+                 if ($tbody) {
+                     [...$tbody.querySelectorAll('tr')].forEach(tr => {
+                         const cols = [...tr.querySelectorAll('td')].map(td => {
+                             const v = (td.textContent || "").replaceAll('"', '""');
+                             return `"${v}"`;
+                         });
+                         if (cols.length) rows.push(cols.join(','));
+                     });
+                 }
+                 const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+                 const a = document.createElement('a');
+                 const href = URL.createObjectURL(blob);
+                 const tagDel = $fDel?.value || "";
+                 const tagAl = $fAl?.value || "";
+                 const tag = tagDel + (tagDel && tagAl ? '_' : '') + tagAl;
+                 a.href = href;
+                 a.download = `movimientos_${tag || new Date().toISOString().slice(0, 10)}.csv`;
+                 document.body.appendChild(a);
+                 a.click();
+                 a.remove();
+                 URL.revokeObjectURL(href);
+             }
+         }
+
+         async function buscarResponsables(term) {
+             if (!term || term.length < 2) { $dlResp.innerHTML = ""; return; }
+             try {
+                 const url = `${API}/api/salida/responsables?term=${encodeURIComponent(term)}`;
+                 const res = await fetch(url);
+                 const data = await res.json().catch(() => ([]));
+                 const items = Array.isArray(data) ? data : (data.items ?? []);
+                 $dlResp.innerHTML = "";
+                 for (const it of items) {
+                     const nombre = pick(it, ["Nombre_Empleado", "Nombre"]) || "";
+                     const depto = pick(it, ["Dpto_Empleado", "Departamento"]) || "";
+                     const puesto = pick(it, ["Puesto_Empleado", "Puesto"]) || "";
+                     const reloj = pick(it, ["Num_Reloj_Empleado", "Reloj"]) || "";
+                     const opt = document.createElement('option');
+                     opt.value = nombre;
+                     opt.setAttribute('data-reloj', reloj);
+                     opt.setAttribute('data-depto', depto);
+                     opt.setAttribute('data-puesto', puesto);
+                     $dlResp.appendChild(opt);
+                 }
+             } catch (e) {
+                 console.error(e);
+                 $dlResp.innerHTML = "";
+             }
+         }
+
+         function onResponsableChanged() {
+             const val = $inputResp.value.trim();
+             const match = [...$dlResp.querySelectorAll('option')].find(o => o.value.toLowerCase() === val.toLowerCase());
+             if (match) {
+                 const nombre = match.value;
+                 const reloj = match.getAttribute('data-reloj') || "";
+                 const depto = match.getAttribute('data-depto') || "";
+                 const puesto = match.getAttribute('data-puesto') || "";
+                 setEmpleadoFromSelection(nombre, depto, puesto, reloj);
+             } else {
+                 clearEmpleado();
+             }
+         }
+
+         if ($cant) $cant.addEventListener('input', updateRegistrarEnabled);
+
+         if ($btnBA) {
+             $btnBA.addEventListener('click', async () => {
+                 const codigo = $codigo.value.trim();
+                 if (!codigo) { alert("Ingresa un código de artículo."); return; }
+                 if ($hint) $hint.textContent = "Buscando artículo…";
+                 try {
+                     const qs = new URLSearchParams({ codigo });
+                     const res = await fetch(`${API}/api/salida/lookup?${qs.toString()}`);
+                     const json = await res.json().catch(() => ({}));
+                     const raw = json.articulo ?? json.Articulo ?? json;
+                     const art = normalizeArticulo(raw);
+                     if (art && (art.Codigo_Articulo || art.Numero_Parte_Articulo)) {
+                         setArticulo(art);
+                         if ($hint) $hint.textContent = "";
+                     } else {
+                         setArticulo(null);
+                         if ($hint) $hint.textContent = "Artículo no encontrado";
+                     }
+                 } catch (e) {
+                     console.error(e);
+                     if ($hint) $hint.textContent = "Error de red";
+                 }
+             });
+         }
+
+         if ($btnReg) {
+             $btnReg.addEventListener('click', async () => {
+                 const codigo = $lblCodigo.textContent.trim();
+                 const reloj = $relojHidden.value.trim();
+                 const cant = Number($cant.value);
+                 const fecha = $fecha.value;
+                 const equipo = $equipo.value.trim();
+                 const responsable = $resp.value.trim();
+
+                 if (!codigo || codigo === "—") { alert("Primero busca un artículo."); return; }
+                 if (!reloj) { alert("Selecciona un responsable válido."); return; }
+                 if (!(cant > 0)) { alert("Cantidad inválida."); return; }
+
+                 try {
+                     $btnReg.disabled = true;
+                     if ($hint) $hint.textContent = "Registrando salida…";
+
+                     const res = await fetch(`${API}/api/salida/registrar`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({
+                             Codigo_Articulo: codigo,
+                             Cantidad: cant,
+                             Num_Reloj_Empleado: reloj,
+                             Equipo: equipo || null,
+                             Responsable: responsable || null,
+                             Fecha_Salida: fecha || null
+                         })
+                     });
+
+                     const payload = await res.json().catch(() => ({}));
+                     if (!res.ok) {
+                         alert(payload?.message || "Error al registrar");
+                         if ($hint) $hint.textContent = "";
+                         updateRegistrarEnabled();
+                         return;
+                     }
+
+                     if (payload?.stockNuevo !== undefined) $lblStock.textContent = payload.stockNuevo;
+                     alert("Salida registrada correctamente.");
+                     if ($hint) $hint.textContent = "";
+                     $cant.value = "";
+                     $equipo.value = "";
+                     updateRegistrarEnabled();
+                     cargarMovimientos();
+                 } catch (e) {
+                     console.error(e);
+                     alert("Error de red");
+                     if ($hint) $hint.textContent = "";
+                     updateRegistrarEnabled();
+                 }
+             });
+         }
+
+         if ($inputResp) {
+             let t;
+             $inputResp.addEventListener('input', () => {
+                 clearTimeout(t);
+                 const term = $inputResp.value.trim();
+                 if (!term || term.length < 2) { $dlResp.innerHTML = ""; clearEmpleado(); return; }
+                 t = setTimeout(() => buscarResponsables(term), 200);
+             });
+             $inputResp.addEventListener('change', onResponsableChanged);
+             $inputResp.addEventListener('blur', onResponsableChanged);
+         }
+
+         if ($codigo) {
+             $codigo.addEventListener('keydown', (e) => {
+                 if (e.key === "Enter") { e.preventDefault(); $btnBA?.click(); }
+             });
+         }
+
+         if ($btnFiltrar) $btnFiltrar.addEventListener('click', cargarMovimientos);
+         if ($btnLimpiar) $btnLimpiar.addEventListener('click', () => {
+             if ($fCodigo) $fCodigo.value = "";
+             if ($fResp) $fResp.value = "";
+             if ($fDel) $fDel.value = "";
+             if ($fAl) $fAl.value = "";
+             cargarMovimientos();
+         });
+         if ($btnExcel) $btnExcel.addEventListener('click', descargarExcel);
+
+         [$fCodigo, $fResp, $fDel, $fAl].forEach(inp => {
+             inp?.addEventListener('keydown', (e) => {
+                 if (e.key === "Enter") { e.preventDefault(); cargarMovimientos(); }
+             });
+         });
+
+         cargarMovimientos();
+         window.cargarMovimientos = cargarMovimientos;
+     })();
+ </script>
+
+
 
 </asp:Content>
-
-
-
-
-
-

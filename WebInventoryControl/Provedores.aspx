@@ -94,18 +94,17 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-      // ===== Endpoints de TU API =====
+
       const BASE = 'https://localhost:7059/api/proveedores';
       const API_GET = BASE + '/Proveedores_tabla';
       const API_POST = BASE + '/registrar';
-      const API_PUT = BASE + '/actualizar';   // se usa /actualizar/{id}
+      const API_PUT = BASE + '/actualizar'; 
 
-      // ===== Estado =====
+ 
       let _cacheProveedores = [];
-      let currentMode = null;    // 'registrar' | 'actualizar'
+      let currentMode = null;    
       let selectedId = null;
 
-      // ===== Utils =====
       const $tbody = () => $('#tbodyProveedores');
       const $pane = () => $('#formPane');
 
@@ -301,8 +300,7 @@
           $('#btnSubmit').on('click', guardar);
           $('#btnReset').on('click', function (e) {
               e.preventDefault();
-              clearForm(); // Si quieres re-prellenar en actualizar, descomenta:
-              // if (currentMode === 'actualizar' && selectedId) fillFormFromRow(selectedId);
+              clearForm(); 
           });
       });
   </script>

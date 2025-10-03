@@ -243,6 +243,7 @@
     <Content Include="Content\css.css" />
     <Content Include="Content\imagens.css" />
     <Content Include="Content\pages\articulo.css" />
+    <Content Include="Content\pages\entrada.css" />
     <Content Include="Content\pages\inicio.css" />
     <Content Include="Content\pages\inventario.css" />
     <Content Include="Content\pages\login.css" />
@@ -252,6 +253,7 @@
     <Content Include="Content\pages\usuario.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Default.aspx" />
+    <Content Include="Entrada.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Huellas.aspx" />
@@ -360,6 +362,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Entrada.aspx.cs">
+      <DependentUpon>Entrada.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Entrada.aspx.designer.cs">
+      <DependentUpon>Entrada.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
