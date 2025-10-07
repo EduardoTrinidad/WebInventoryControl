@@ -88,166 +88,142 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-      $(function () {
-          const API = "https://localhost:7059/api/entrada";
+<script>
+    $(function () {
+        const API = "https://localhost:7059/api/entrada";
 
-          // ===== Fecha por defecto = hoy (editable) =====
-          (function setHoy() {
-              const d = new Date();
-              const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-              $("#fechaEntrada").val(iso);
-          })();
+        // --- helpers para tolerar camelCase/PascalCase y guiones bajos ---
+        const canon = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+        const pick = (obj, names) => {
+            if (!obj) return null;
+            // mapa por clave canonizada
+            const map = new Map();
+            Object.keys(obj).forEach(k => map.set(canon(k), obj[k]));
+            for (const n of names) {
+                const v = map.get(canon(n));
+                if (v !== undefined && v !== null) return v;
+            }
+            return null;
+        };
+        const normalizeArticulo = a => !a ? null : ({
+            Codigo_Articulo: pick(a, ["Codigo_Articulo"]),
+            Numero_Parte_Articulo: pick(a, ["Numero_Parte_Articulo"]),
+            Descripcion_Articulo: pick(a, ["Descripcion_Articulo"]),
+            Stock_Actual_Articulo: pick(a, ["Stock_Actual_Articulo"]),
+            Unidad_Medida_Articulo: pick(a, ["Unidad_Medida_Articulo"])
+        });
+        const normalizeEmpleado = e => !e ? null : ({
+            Num_Reloj_Empleado: pick(e, ["Num_Reloj_Empleado"]),
+            Nombre_Empleado: pick(e, ["Nombre_Empleado"]),
+            Dpto_Empleado: pick(e, ["Dpto_Empleado"]),
+            Puesto_Empleado: pick(e, ["Puesto_Empleado"])
+        });
 
-          // --- helpers tolerantes (camel/Pascal/guion_bajo) ---
-          const canon = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
-          const pick = (obj, names) => {
-              if (!obj) return null;
-              const map = new Map();
-              Object.keys(obj).forEach(k => map.set(canon(k), obj[k]));
-              for (const n of names) {
-                  const v = map.get(canon(n));
-                  if (v !== undefined && v !== null) return v;
-              }
-              return null;
-          };
-          const normalizeArticulo = a => !a ? null : ({
-              Codigo_Articulo: pick(a, ["Codigo_Articulo"]),
-              Numero_Parte_Articulo: pick(a, ["Numero_Parte_Articulo"]),
-              Descripcion_Articulo: pick(a, ["Descripcion_Articulo"]),
-              Stock_Actual_Articulo: pick(a, ["Stock_Actual_Articulo"]),
-              Unidad_Medida_Articulo: pick(a, ["Unidad_Medida_Articulo"])
-          });
-          const normalizeEmpleado = e => !e ? null : ({
-              Num_Reloj_Empleado: pick(e, ["Num_Reloj_Empleado"]),
-              Nombre_Empleado: pick(e, ["Nombre_Empleado"]),
-              Dpto_Empleado: pick(e, ["Dpto_Empleado"]),
-              Puesto_Empleado: pick(e, ["Puesto_Empleado"])
-          });
+        function setArticulo(a) {
+            if (!a) { $("#lblCodigo,#lblNombreParte,#lblDescripcion,#lblStock,#lblUnidad").text("—").addClass("muted"); return; }
+            $("#lblCodigo").text(a.Codigo_Articulo || "—");
+            $("#lblNombreParte").text(a.Numero_Parte_Articulo || "—");
+            $("#lblDescripcion").text(a.Descripcion_Articulo || "—");
+            $("#lblStock").text(a.Stock_Actual_Articulo ?? "—");
+            $("#lblUnidad").text(a.Unidad_Medida_Articulo || "—");
+            $("#lblCodigo,#lblNombreParte,#lblDescripcion,#lblStock,#lblUnidad").removeClass("muted");
+            updateBtn();
+        }
+        function setEmpleado(e) {
+            if (!e) { $("#lblEmpleado,#lblDepto,#lblPuesto").text("—").addClass("muted"); return; }
+            $("#lblEmpleado").text(e.Nombre_Empleado || "—");
+            $("#lblDepto").text(e.Dpto_Empleado || "—");
+            $("#lblPuesto").text(e.Puesto_Empleado || "—");
+            $("#lblEmpleado,#lblDepto,#lblPuesto").removeClass("muted");
+            updateBtn();
+        }
 
-          function setArticulo(a) {
-              if (!a) { $("#lblCodigo,#lblNombreParte,#lblDescripcion,#lblStock,#lblUnidad").text("—").addClass("muted"); return; }
-              $("#lblCodigo").text(a.Codigo_Articulo || "—");
-              $("#lblNombreParte").text(a.Numero_Parte_Articulo || "—");
-              $("#lblDescripcion").text(a.Descripcion_Articulo || "—");
-              $("#lblStock").text(a.Stock_Actual_Articulo ?? "—");
-              $("#lblUnidad").text(a.Unidad_Medida_Articulo || "—");
-              $("#lblCodigo,#lblNombreParte,#lblDescripcion,#lblStock,#lblUnidad").removeClass("muted");
-              updateBtn();
-          }
-          function setEmpleado(e) {
-              if (!e) { $("#lblEmpleado,#lblDepto,#lblPuesto").text("—").addClass("muted"); return; }
-              $("#lblEmpleado").text(e.Nombre_Empleado || "—");
-              $("#lblDepto").text(e.Dpto_Empleado || "—");
-              $("#lblPuesto").text(e.Puesto_Empleado || "—");
-              $("#lblEmpleado,#lblDepto,#lblPuesto").removeClass("muted");
-              updateBtn();
-          }
+        function updateBtn() {
+            const ok = $("#lblCodigo").text() !== "—" &&
+                $("#lblEmpleado").text() !== "—" &&
+                Number($("#cantidad").val()) > 0 &&
+                $("#numReloj").val().trim().length > 0;
+            $("#btnRegistrar").prop("disabled", !ok);
+        }
+        $("#cantidad,#numReloj").on("input", updateBtn);
 
-          function updateBtn() {
-              const ok = $("#lblCodigo").text() !== "—" &&
-                  $("#lblEmpleado").text() !== "—" &&
-                  Number($("#cantidad").val()) > 0 &&
-                  $("#numReloj").val().trim().length > 0;
-              $("#btnRegistrar").prop("disabled", !ok);
-          }
-          $("#cantidad,#numReloj").on("input", updateBtn);
+        // === Buscar artículo ===
+        $("#btnBuscarArticulo").click(function () {
+            const c = $("#codigoArticulo").val().trim();
+            if (!c) return alert("Ingresa un código");
+            $("#hint").text("Buscando artículo…");
+            $.get(API + "/lookup", { codigo: c })
+                .done(d => {
+                    console.log("lookup articulo ->", d); // para verificar en consola
+                    const art = normalizeArticulo(d.articulo || d.Articulo || d);
+                    setArticulo(art);
+                    $("#hint").text(art ? "" : "Artículo no encontrado");
+                })
+                .fail(xhr => {
+                    console.log("lookup articulo error", xhr.status, xhr.responseText);
+                    setArticulo(null);
+                    $("#hint").text("Artículo no encontrado");
+                });
+        });
 
-          // === Buscar artículo ===
-          $("#btnBuscarArticulo").click(function () {
-              const c = $("#codigoArticulo").val().trim();
-              if (!c) return alert("Ingresa un código");
-              $("#hint").text("Buscando artículo…");
-              $.get(API + "/lookup", { codigo: c })
-                  .done(d => {
-                      const art = normalizeArticulo(d.articulo || d.Articulo || d);
-                      setArticulo(art);
-                      $("#hint").text(art ? "" : "Artículo no encontrado");
-                  })
-                  .fail(() => { setArticulo(null); $("#hint").text("Artículo no encontrado"); });
-          });
+        // === Buscar empleado ===
+        $("#btnBuscarEmpleado").click(function () {
+            const r = $("#numReloj").val().trim();
+            if (!r) return alert("Ingresa un # de reloj");
+            $("#hint").text("Buscando empleado…");
+            $.get(API + "/lookup", { reloj: r })
+                .done(d => {
+                    console.log("lookup empleado ->", d);
+                    const emp = normalizeEmpleado(d.empleado || d.Empleado || d);
+                    setEmpleado(emp);
+                    $("#hint").text(emp ? "" : "Empleado no encontrado");
+                })
+                .fail(xhr => {
+                    console.log("lookup empleado error", xhr.status, xhr.responseText);
+                    setEmpleado(null);
+                    $("#hint").text("Empleado no encontrado");
+                });
+        });
 
-          // === Buscar empleado ===
-          $("#btnBuscarEmpleado").click(function () {
-              const r = $("#numReloj").val().trim();
-              if (!r) return alert("Ingresa un # de reloj");
-              $("#hint").text("Buscando empleado…");
-              $.get(API + "/lookup", { reloj: r })
-                  .done(d => {
-                      const emp = normalizeEmpleado(d.empleado || d.Empleado || d);
-                      setEmpleado(emp);
-                      $("#hint").text(emp ? "" : "Empleado no encontrado");
-                  })
-                  .fail(() => { setEmpleado(null); $("#hint").text("Empleado no encontrado"); });
-          });
+        // === Registrar ===
+        $("#btnRegistrar").click(function () {
+            const datos = {
+                Codigo_Articulo: $("#lblCodigo").text(),
+                Cantidad: $("#cantidad").val(),
+                Num_Reloj_Empleado: $("#numReloj").val(),
+                Fecha_Entrada: $("#fechaEntrada").val()
+            };
+            $("#hint").text("Registrando…");
+            $.post(API + "/registrar", datos)
+                .done(() => {
+                    alert("Entrada registrada correctamente");
+                    $("#hint").text("");
+                    $("#btnBuscarEntradas").click();
+                })
+                .fail(e => {
+                    $("#hint").text("");
+                    alert("Error al registrar: " + (e.responseJSON?.message || e.statusText));
+                });
+        });
 
-          // === Registrar ===
-          $("#btnRegistrar").click(function () {
-              const datos = {
-                  Codigo_Articulo: $("#lblCodigo").text(),
-                  Cantidad: $("#cantidad").val(),
-                  Num_Reloj_Empleado: $("#numReloj").val(),
-                  Fecha_Entrada: $("#fechaEntrada").val()
-              };
-              $("#hint").text("Registrando…");
-              $.post(API + "/registrar", datos)
-                  .done(() => {
-                      alert("Entrada registrada correctamente");
-                      $("#hint").text("");
-                      cargarMovimientos(true); // recarga últimos 10
-                  })
-                  .fail(e => {
-                      $("#hint").text("");
-                      alert("Error al registrar: " + (e.responseJSON?.message || e.statusText));
-                  });
-          });
+        // === Buscar entradas ===
+        $("#btnBuscarEntradas").click(function () {
+            const filtros = { codigo: $("#fCodigo").val(), reloj: $("#fReloj").val() };
+            $.get(API + "/movimientos", filtros)
+                .done(d => {
+                    const t = $("#tblEntradas tbody").empty();
+                    (d.items || []).forEach(x => {
+                        t.append(`<tr>
+              <td>${x.Fecha_Entrada}</td>
+              <td>${x.Codigo_Articulo}</td>
+              <td>${x.Num_Reloj_Empleado}</td>
+              <td>${x.Cantidad}</td>
+            </tr>`);
+                    });
+                })
+                .fail(() => alert("Error al cargar movimientos"));
+        });
+    });
+</script>
 
-          // === Movimientos (top 10 por defecto) ===
-          function cargarMovimientos(top10PorDefecto) {
-              const codigo = $("#fCodigo").val().trim();
-              const reloj = $("#fReloj").val().trim();
-
-              const params = {};
-              if (codigo) params.codigo = codigo;
-              if (reloj) params.reloj = reloj;
-              if (!codigo && !reloj) params.top = top10PorDefecto ? 10 : 10;
-
-              $.get(API + "/movimientos", params)
-                  .done(d => {
-                      const t = $("#tblEntradas tbody").empty();
-
-                      // acepta {items:[...]} o directamente [...]
-                      const items = Array.isArray(d) ? d : (d.items || d.result || []);
-
-                      if (!items.length) {
-                          t.append(`<tr><td colspan="4">Sin resultados</td></tr>`);
-                          return;
-                      }
-
-                      for (const it of items) {
-                          const fecha = pick(it, ["Fecha_Entrada", "FechaEntrada", "Fecha"]) || "—";
-                          const codigo = pick(it, ["Codigo_Articulo", "Codigo"]) || "—";
-                          const reloj = pick(it, ["Num_Reloj_Empleado", "Numero_Reloj", "Reloj"]) || "—";
-                          const cant = pick(it, ["Cantidad"]) ?? "0";
-
-                          t.append(`<tr>
-          <td>${fecha}</td>
-          <td>${codigo}</td>
-          <td>${reloj}</td>
-          <td>${cant}</td>
-        </tr>`);
-                      }
-                  })
-                  .fail(() => alert("Error al cargar movimientos"));
-          }
-
-          $("#btnBuscarEntradas").click(function () {
-              cargarMovimientos(false);
-          });
-
-          // Al abrir la página: últimos 10
-          cargarMovimientos(true);
-
-      });
-  </script>
-</asp:Content>
+</asp:Content>
