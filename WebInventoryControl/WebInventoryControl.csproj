@@ -367,6 +367,7 @@
     </Compile>
     <Compile Include="Entrada.aspx.cs">
       <DependentUpon>Entrada.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Entrada.aspx.designer.cs">
       <DependentUpon>Entrada.aspx</DependentUpon>

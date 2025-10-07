@@ -42,7 +42,7 @@
       <a href="Usuarios.aspx"><i class="bi bi-person-plus"></i> Usuarios</a>
       <a href="Provedores.aspx"><i class="bi bi-basket"></i> Provedores</a>
       <a href="Articulos.aspx"><i class="bi bi-plus-square"></i> Salida</a>
-      <a href="Huella.aspx"><i class="bi bi-hand-index-thumb"></i> Entradas</a>
+      <a href="Entrada.aspx"><i class="bi bi-hand-index-thumb"></i> Entradas</a>
 
       <asp:ContentPlaceHolder ID="SidebarContent" runat="server" />
     </div>
