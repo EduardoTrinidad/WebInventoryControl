@@ -37,13 +37,9 @@
   <!-- ===== CARD: Salida de artículo ===== -->
   <div class="card">
     <div class="card-h">
-      <div class="badge">OUT</div>
+      <div class="badge">JPH</div>
       <div>
         <h3 style="margin:0">Salida de artículo</h3>
-        <p style="margin:.2rem 0 0;color:#6b7280">
-          Busca por separado el <strong>artículo</strong> y el <strong>responsable</strong>. 
-          Luego registra la salida.
-        </p>
       </div>
     </div>
 
@@ -52,7 +48,7 @@
       <div class="grid" style="grid-column:1/-1;margin-bottom:.25rem">
         <div class="field">
           <label for="codigoArticulo">Código de artículo</label>
-          <input id="codigoArticulo" class="control" type="search" placeholder="Ej. A-0001 / t03" />
+          <input id="codigoArticulo" class="control" type="search" placeholder="Ej. T03" />
         </div>
         <div class="field" style="display:flex;align-items:flex-end">
           <button id="btnBuscarArticulo" class="btn btn-outline" type="button">Buscar artículo</button>
@@ -84,19 +80,21 @@
 
       <hr />
 
-      <!-- Buscar Responsable -->
+      <!-- Buscar Responsable SOLO por # RELOJ -->
       <div class="grid" style="grid-column:1/-1;margin-bottom:.25rem">
         <div class="field">
-          <label for="responsableBuscar">Responsable</label>
+          <label for="responsableBuscar"># Reloj (Empleado)</label>
           <input id="responsableBuscar"
                  class="control"
                  type="search"
                  list="dlResponsables"
-                 placeholder="Escribe el nombre y selecciona" />
+                 placeholder="Escribe # reloj y selecciona" />
           <datalist id="dlResponsables"></datalist>
+          <input id="relojEmpleado" type="hidden" />
         </div>
-        <!-- Campo oculto para guardar el # de reloj asociado -->
-        <input id="relojEmpleado" type="hidden" />
+        <div class="field" style="display:flex;align-items:flex-end">
+          <button id="btnBuscarEmpleado" class="btn btn-outline" type="button">Buscar empleado</button>
+        </div>
       </div>
 
       <div class="grid" style="grid-column:1/-1;">
@@ -143,15 +141,11 @@
     </div>
   </div>
 
-  <!-- ===== CARD: Movimientos ===== -->
   <div class="card" style="margin-top:16px">
     <div class="card-h">
-      <div class="badge">LOG</div>
+      <div class="badge">JPH</div>
       <div>
-        <h3 style="margin:0">Movimientos por rango</h3>
-        <p style="margin:.2rem 0 0;color:#6b7280">
-          Filtra por Código, Responsable y rango de fechas.
-        </p>
+        <h3 style="margin:0">Movimientos</h3>
       </div>
     </div>
 
@@ -159,7 +153,7 @@
       <div class="grid" style="grid-column:1/-1;margin-bottom:.5rem">
         <div class="field">
           <label for="fCodigo">Código de artículo (opcional)</label>
-          <input id="fCodigo" class="control" type="search" placeholder="Ej. A-0001 / t03" />
+          <input id="fCodigo" class="control" type="search" placeholder="Ej. T03" />
         </div>
         <div class="field">
           <label for="fResponsable">Responsable (opcional)</label>
@@ -204,403 +198,458 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
- <script>
-     (() => {
-         'use strict';
+  <script>
+      (() => {
+          'use strict';
 
-         const API = "https://localhost:7059";
+          const API = "https://localhost:7059";
 
-         const $codigo = document.getElementById('codigoArticulo');
-         const $cant = document.getElementById('cantSalida');
-         const $fecha = document.getElementById('fechaSalida');
-         const $equipo = document.getElementById('equipo');
-         const $resp = document.getElementById('responsable');
+          const $codigo = document.getElementById('codigoArticulo');
+          const $cant = document.getElementById('cantSalida');
+          const $fecha = document.getElementById('fechaSalida');
+          const $equipo = document.getElementById('equipo');
+          const $resp = document.getElementById('responsable');
 
-         const $lblCodigo = document.getElementById('lblCodigo');
-         const $lblNombreParte = document.getElementById('lblNombreParte');
-         const $lblDescripcion = document.getElementById('lblDescripcion');
-         const $lblStock = document.getElementById('lblStock');
-         const $lblUnidad = document.getElementById('lblUnidad');
+          const $lblCodigo = document.getElementById('lblCodigo');
+          const $lblNombreParte = document.getElementById('lblNombreParte');
+          const $lblDescripcion = document.getElementById('lblDescripcion');
+          const $lblStock = document.getElementById('lblStock');
+          const $lblUnidad = document.getElementById('lblUnidad');
 
-         const $lblEmpleado = document.getElementById('lblEmpleado');
-         const $lblDepto = document.getElementById('lblDepto');
-         const $lblPuesto = document.getElementById('lblPuesto');
+          const $lblEmpleado = document.getElementById('lblEmpleado');
+          const $lblDepto = document.getElementById('lblDepto');
+          const $lblPuesto = document.getElementById('lblPuesto');
 
-         const $btnBA = document.getElementById('btnBuscarArticulo');
-         const $btnReg = document.getElementById('btnRegistrar');
-         const $hint = document.getElementById('hint');
+          const $btnBA = document.getElementById('btnBuscarArticulo');
+          const $btnBE = document.getElementById('btnBuscarEmpleado');
+          const $btnReg = document.getElementById('btnRegistrar');
+          const $hint = document.getElementById('hint');
 
-         const $fCodigo = document.getElementById('fCodigo');
-         const $fResp = document.getElementById('fResponsable');
-         const $fDel = document.getElementById('fDel');
-         const $fAl = document.getElementById('fAl');
+          const $fCodigo = document.getElementById('fCodigo');
+          const $fResp = document.getElementById('fResponsable');
+          const $fDel = document.getElementById('fDel');
+          const $fAl = document.getElementById('fAl');
 
-         const $btnFiltrar = document.getElementById('btnFiltrar');
-         const $btnLimpiar = document.getElementById('btnLimpiar');
-         const $btnExcel = document.getElementById('btnExcel');
+          const $btnFiltrar = document.getElementById('btnFiltrar');
+          const $btnLimpiar = document.getElementById('btnLimpiar');
+          const $btnExcel = document.getElementById('btnExcel');
 
-         const $tbl = document.getElementById('tblMovs');
-         const $tbody = $tbl ? $tbl.querySelector('tbody') : null;
-         const $movHint = document.getElementById('movHint');
+          const $tbl = document.getElementById('tblMovs');
+          const $tbody = $tbl ? $tbl.querySelector('tbody') : null;
+          const $movHint = document.getElementById('movHint');
 
-         const $inputResp = document.getElementById('responsableBuscar');
-         const $dlResp = document.getElementById('dlResponsables');
-         const $relojHidden = document.getElementById('relojEmpleado');
+          const $inputResp = document.getElementById('responsableBuscar');
+          const $dlResp = document.getElementById('dlResponsables');
+          const $relojHidden = document.getElementById('relojEmpleado');
 
-         (function () {
-             if ($fecha) {
-                 const d = new Date();
-                 $fecha.value = d.toISOString().slice(0, 10);
-             }
-         })();
+          // Fecha default = hoy
+          (function () {
+              if ($fecha) {
+                  const d = new Date();
+                  $fecha.value = d.toISOString().slice(0, 10);
+              }
+          })();
 
-         const canon = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
-         const pick = (obj, keys) => {
-             if (!obj) return null;
-             const map = new Map();
-             Object.keys(obj).forEach(k => map.set(canon(k), obj[k]));
-             for (const wanted of keys) {
-                 const v = map.get(canon(wanted));
-                 if (v !== undefined && v !== null && v !== "") return v;
-             }
-             return null;
-         };
+          const canon = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+          const pick = (obj, keys) => {
+              if (!obj) return null;
+              const map = new Map();
+              Object.keys(obj).forEach(k => map.set(canon(k), obj[k]));
+              for (const wanted of keys) {
+                  const v = map.get(canon(wanted));
+                  if (v !== undefined && v !== null && v !== "") return v;
+              }
+              return null;
+          };
 
-         function normalizeArticulo(a) {
-             if (!a) return null;
-             return {
-                 Codigo_Articulo: pick(a, ["Codigo_Articulo"]),
-                 Numero_Parte_Articulo: pick(a, ["Numero_Parte_Articulo"]),
-                 Descripcion_Articulo: pick(a, ["Descripcion_Articulo"]),
-                 Stock_Actual_Articulo: pick(a, ["Stock_Actual_Articulo"]),
-                 Unidad_Medida_Articulo: pick(a, ["Unidad_Medida_Articulo"])
-             };
-         }
+          function normalizeArticulo(a) {
+              if (!a) return null;
+              return {
+                  Codigo_Articulo: pick(a, ["Codigo_Articulo"]),
+                  Numero_Parte_Articulo: pick(a, ["Numero_Parte_Articulo"]),
+                  Descripcion_Articulo: pick(a, ["Descripcion_Articulo"]),
+                  Stock_Actual_Articulo: pick(a, ["Stock_Actual_Articulo"]),
+                  Unidad_Medida_Articulo: pick(a, ["Unidad_Medida_Articulo"])
+              };
+          }
 
-         function setArticulo(a) {
-             if (a) {
-                 $lblCodigo.textContent = a.Codigo_Articulo ?? "—";
-                 $lblNombreParte.textContent = a.Numero_Parte_Articulo ?? "—";
-                 $lblDescripcion.textContent = a.Descripcion_Articulo ?? "—";
-                 $lblStock.textContent = a.Stock_Actual_Articulo ?? "—";
-                 $lblUnidad.textContent = a.Unidad_Medida_Articulo ?? "—";
-                 [$lblCodigo, $lblNombreParte, $lblDescripcion, $lblStock, $lblUnidad].forEach(el => el.classList.remove('muted'));
-             } else {
-                 [$lblCodigo, $lblNombreParte, $lblDescripcion, $lblStock, $lblUnidad].forEach(el => { el.textContent = "—"; el.classList.add('muted'); });
-             }
-             updateRegistrarEnabled();
-         }
+          function setArticulo(a) {
+              if (a) {
+                  $lblCodigo.textContent = a.Codigo_Articulo ?? "—";
+                  $lblNombreParte.textContent = a.Numero_Parte_Articulo ?? "—";
+                  $lblDescripcion.textContent = a.Descripcion_Articulo ?? "—";
+                  $lblStock.textContent = a.Stock_Actual_Articulo ?? "—";
+                  $lblUnidad.textContent = a.Unidad_Medida_Articulo ?? "—";
+                  [$lblCodigo, $lblNombreParte, $lblDescripcion, $lblStock, $lblUnidad].forEach(el => el.classList.remove('muted'));
+              } else {
+                  [$lblCodigo, $lblNombreParte, $lblDescripcion, $lblStock, $lblUnidad].forEach(el => { el.textContent = "—"; el.classList.add('muted'); });
+              }
+              updateRegistrarEnabled();
+          }
 
-         function setEmpleadoFromSelection(nombre, depto, puesto, reloj) {
-             $lblEmpleado.textContent = nombre || "—";
-             $lblDepto.textContent = depto || "—";
-             $lblPuesto.textContent = puesto || "—";
-             [$lblEmpleado, $lblDepto, $lblPuesto].forEach(el => el.classList.remove('muted'));
-             $relojHidden.value = reloj || "";
-             updateRegistrarEnabled();
-         }
+          function setEmpleadoFromSelection(nombre, depto, puesto, reloj) {
+              $lblEmpleado.textContent = nombre || "—";
+              $lblDepto.textContent = depto || "—";
+              $lblPuesto.textContent = puesto || "—";
+              [$lblEmpleado, $lblDepto, $lblPuesto].forEach(el => el.classList.remove('muted'));
+              $relojHidden.value = reloj || "";
+              updateRegistrarEnabled();
+          }
 
-         function clearEmpleado() {
-             [$lblEmpleado, $lblDepto, $lblPuesto].forEach(el => { el.textContent = "—"; el.classList.add('muted'); });
-             $relojHidden.value = "";
-             updateRegistrarEnabled();
-         }
+          function clearEmpleado() {
+              [$lblEmpleado, $lblDepto, $lblPuesto].forEach(el => { el.textContent = "—"; el.classList.add('muted'); });
+              $relojHidden.value = "";
+              updateRegistrarEnabled();
+          }
 
-         function updateRegistrarEnabled() {
-             const ok =
-                 ($lblCodigo.textContent && $lblCodigo.textContent !== "—") &&
-                 ($lblEmpleado.textContent && $lblEmpleado.textContent !== "—") &&
-                 (Number($cant.value) > 0) &&
-                 ($relojHidden.value && $relojHidden.value.trim() !== "");
-             $btnReg.disabled = !ok;
-         }
+          function updateRegistrarEnabled() {
+              const ok =
+                  ($lblCodigo.textContent && $lblCodigo.textContent !== "—") &&
+                  ($lblEmpleado.textContent && $lblEmpleado.textContent !== "—") &&
+                  (Number($cant.value) > 0) &&
+                  ($relojHidden.value && $relojHidden.value.trim() !== "");
+              $btnReg.disabled = !ok;
+          }
 
-         function fmtFecha(isoLike) {
-             if (!isoLike) return "—";
-             try {
-                 const d = new Date(isoLike);
-                 if (isNaN(d.getTime())) return isoLike;
-                 const pad = n => String(n).padStart(2, '0');
-                 return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-             } catch { return isoLike; }
-         }
+          function fmtFecha(isoLike) {
+              if (!isoLike) return "—";
+              try {
+                  const d = new Date(isoLike);
+                  if (isNaN(d.getTime())) return isoLike;
+                  const pad = n => String(n).padStart(2, '0');
+                  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+              } catch { return isoLike; }
+          }
 
-         function normalizeMovimiento(m) {
-             return {
-                 Fecha_Salida: pick(m, ["Fecha_Salida", "Fecha"]),
-                 Codigo_Articulo: pick(m, ["Codigo_Articulo", "Codigo"]),
-                 Num_Reloj_Empleado: pick(m, ["Num_Reloj_Empleado", "Reloj", "Numero_Reloj"]),
-                 Cantidad: Number(pick(m, ["Cantidad", "Qty", "Cantidad_Salida"]) ?? 0),
-                 Equipo: pick(m, ["Equipo"]),
-                 Responsable: pick(m, ["Responsable"])
-             };
-         }
+          function normalizeMovimiento(m) {
+              return {
+                  Fecha_Salida: pick(m, ["Fecha_Salida", "Fecha"]),
+                  Codigo_Articulo: pick(m, ["Codigo_Articulo", "Codigo"]),
+                  Num_Reloj_Empleado: pick(m, ["Num_Reloj_Empleado", "Reloj", "Numero_Reloj"]),
+                  Cantidad: Number(pick(m, ["Cantidad", "Qty", "Cantidad_Salida"]) ?? 0),
+                  Equipo: pick(m, ["Equipo"]),
+                  Responsable: pick(m, ["Responsable"])
+              };
+          }
 
-         function renderRows(items) {
-             if (!$tbody) return;
-             $tbody.innerHTML = "";
-             if (!items?.length) {
-                 const tr = document.createElement('tr');
-                 const td = document.createElement('td');
-                 td.colSpan = 6;
-                 td.textContent = "Sin resultados.";
-                 tr.appendChild(td);
-                 $tbody.appendChild(tr);
-                 return;
-             }
-             for (const it of items) {
-                 const n = normalizeMovimiento(it);
-                 const tr = document.createElement('tr');
-                 tr.innerHTML = `
-        <td>${fmtFecha(n.Fecha_Salida)}</td>
-        <td>${n.Codigo_Articulo ?? "—"}</td>
-        <td>${n.Num_Reloj_Empleado ?? "—"}</td>
-        <td>${n.Cantidad ?? 0}</td>
-        <td>${n.Equipo ?? "—"}</td>
-        <td>${n.Responsable ?? "—"}</td>
-      `;
-                 $tbody.appendChild(tr);
-             }
-         }
+          function renderRows(items) {
+              if (!$tbody) return;
+              $tbody.innerHTML = "";
+              if (!items?.length) {
+                  const tr = document.createElement('tr');
+                  const td = document.createElement('td');
+                  td.colSpan = 6;
+                  td.textContent = "Sin resultados.";
+                  tr.appendChild(td);
+                  $tbody.appendChild(tr);
+                  return;
+              }
+              for (const it of items) {
+                  const n = normalizeMovimiento(it);
+                  const tr = document.createElement('tr');
+                  tr.innerHTML = `
+          <td>${fmtFecha(n.Fecha_Salida)}</td>
+          <td>${n.Codigo_Articulo ?? "—"}</td>
+          <td>${n.Num_Reloj_Empleado ?? "—"}</td>
+          <td>${n.Cantidad ?? 0}</td>
+          <td>${n.Equipo ?? "—"}</td>
+          <td>${n.Responsable ?? "—"}</td>
+        `;
+                  $tbody.appendChild(tr);
+              }
+          }
 
-         function buildQuery() {
-             const qs = new URLSearchParams();
-             const hasRange = Boolean($fDel?.value) || Boolean($fAl?.value);
-             if ($fCodigo?.value.trim()) qs.set('codigo', $fCodigo.value.trim());
-             if ($fResp?.value.trim()) qs.set('responsable', $fResp.value.trim());
-             if ($fDel?.value) qs.set('fechaInicio', $fDel.value);
-             if ($fAl?.value) qs.set('fechaFin', $fAl.value);
-             if (!hasRange) qs.set('top', '10');
-             return qs.toString();
-         }
+          function buildQuery() {
+              const qs = new URLSearchParams();
+              const hasRange = Boolean($fDel?.value) || Boolean($fAl?.value);
+              if ($fCodigo?.value.trim()) qs.set('codigo', $fCodigo.value.trim());
+              if ($fResp?.value.trim()) qs.set('responsable', $fResp.value.trim());
+              if ($fDel?.value) qs.set('fechaInicio', $fDel.value);
+              if ($fAl?.value) qs.set('fechaFin', $fAl.value);
+              if (!hasRange) qs.set('top', '10');
+              return qs.toString();
+          }
 
-         async function cargarMovimientos() {
-             try {
-                 if ($movHint) $movHint.textContent = "Cargando…";
-                 const qs = buildQuery();
-                 const url = `${API}/api/salida/movimientos${qs ? ('?' + qs) : ''}`;
-                 const res = await fetch(url);
-                 const data = await res.json().catch(() => []);
-                 const items = Array.isArray(data) ? data : (data.items ?? data.result ?? []);
-                 renderRows(items);
-                 const hasRange = Boolean($fDel?.value) || Boolean($fAl?.value);
-                 if ($movHint) $movHint.textContent = hasRange ? "Rango aplicado" : "Mostrando últimos 10";
-             } catch (e) {
-                 console.error(e);
-                 renderRows([]);
-                 if ($movHint) $movHint.textContent = "Error al cargar";
-             }
-         }
+          async function cargarMovimientos() {
+              try {
+                  if ($movHint) $movHint.textContent = "Cargando…";
+                  const qs = buildQuery();
+                  const url = `${API}/api/salida/movimientos${qs ? ('?' + qs) : ''}`;
+                  const res = await fetch(url);
+                  const data = await res.json().catch(() => []);
+                  const items = Array.isArray(data) ? data : (data.items ?? data.result ?? []);
+                  renderRows(items);
+                  const hasRange = Boolean($fDel?.value) || Boolean($fAl?.value);
+                  if ($movHint) $movHint.textContent = hasRange ? "Rango aplicado" : "Mostrando últimos 10";
+              } catch (e) {
+                  console.error(e);
+                  renderRows([]);
+                  if ($movHint) $movHint.textContent = "Error al cargar";
+              }
+          }
 
-         async function descargarExcel() {
-             try {
-                 const qs = buildQuery();
-                 const url = `${API}/api/salida/movimientos/excel${qs ? ('?' + qs) : ''}`;
-                 const res = await fetch(url);
-                 if (!res.ok) throw new Error();
-                 const blob = await res.blob();
-                 const ct = (res.headers.get('Content-Type') || '').toLowerCase();
-                 const isCsv = ct.includes('text/csv') || ct.includes('application/vnd.ms-excel');
-                 const ext = isCsv ? 'csv' : 'xlsx';
-                 const a = document.createElement('a');
-                 const href = URL.createObjectURL(blob);
-                 a.href = href;
-                 const tagDel = $fDel?.value || "";
-                 const tagAl = $fAl?.value || "";
-                 const tag = tagDel + (tagDel && tagAl ? '_' : '') + tagAl;
-                 a.download = `movimientos_${tag || new Date().toISOString().slice(0, 10)}.${ext}`;
-                 document.body.appendChild(a);
-                 a.click();
-                 a.remove();
-                 URL.revokeObjectURL(href);
-             } catch {
-                 const rows = [];
-                 const headers = ["Fecha", "Código", "# Reloj", "Cantidad", "Equipo", "Responsable"];
-                 rows.push(headers.join(','));
-                 if ($tbody) {
-                     [...$tbody.querySelectorAll('tr')].forEach(tr => {
-                         const cols = [...tr.querySelectorAll('td')].map(td => {
-                             const v = (td.textContent || "").replaceAll('"', '""');
-                             return `"${v}"`;
-                         });
-                         if (cols.length) rows.push(cols.join(','));
-                     });
-                 }
-                 const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-                 const a = document.createElement('a');
-                 const href = URL.createObjectURL(blob);
-                 const tagDel = $fDel?.value || "";
-                 const tagAl = $fAl?.value || "";
-                 const tag = tagDel + (tagDel && tagAl ? '_' : '') + tagAl;
-                 a.href = href;
-                 a.download = `movimientos_${tag || new Date().toISOString().slice(0, 10)}.csv`;
-                 document.body.appendChild(a);
-                 a.click();
-                 a.remove();
-                 URL.revokeObjectURL(href);
-             }
-         }
+          async function descargarExcel() {
+              try {
+                  const qs = buildQuery();
+                  const url = `${API}/api/salida/movimientos/excel${qs ? ('?' + qs) : ''}`;
+                  const res = await fetch(url);
+                  if (!res.ok) throw new Error();
+                  const blob = await res.blob();
+                  const ct = (res.headers.get('Content-Type') || '').toLowerCase();
+                  const isCsv = ct.includes('text/csv') || ct.includes('application/vnd.ms-excel');
+                  const ext = isCsv ? 'csv' : 'xlsx';
+                  const a = document.createElement('a');
+                  const href = URL.createObjectURL(blob);
+                  a.href = href;
+                  const tagDel = $fDel?.value || "";
+                  const tagAl = $fAl?.value || "";
+                  const tag = tagDel + (tagDel && tagAl ? '_' : '') + tagAl;
+                  a.download = `movimientos_${tag || new Date().toISOString().slice(0, 10)}.${ext}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(href);
+              } catch {
+                  const rows = [];
+                  const headers = ["Fecha", "Código", "# Reloj", "Cantidad", "Equipo", "Responsable"];
+                  rows.push(headers.join(','));
+                  if ($tbody) {
+                      [...$tbody.querySelectorAll('tr')].forEach(tr => {
+                          const cols = [...tr.querySelectorAll('td')].map(td => {
+                              const v = (td.textContent || "").replaceAll('"', '""');
+                              return `"${v}"`;
+                          });
+                          if (cols.length) rows.push(cols.join(','));
+                      });
+                  }
+                  const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+                  const a = document.createElement('a');
+                  const href = URL.createObjectURL(blob);
+                  const tagDel = $fDel?.value || "";
+                  const tagAl = $fAl?.value || "";
+                  const tag = tagDel + (tagDel && tagAl ? '_' : '') + tagAl;
+                  a.href = href;
+                  a.download = `movimientos_${tag || new Date().toISOString().slice(0, 10)}.csv`;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(href);
+              }
+          }
 
-         async function buscarResponsables(term) {
-             if (!term || term.length < 2) { $dlResp.innerHTML = ""; return; }
-             try {
-                 const url = `${API}/api/salida/responsables?term=${encodeURIComponent(term)}`;
-                 const res = await fetch(url);
-                 const data = await res.json().catch(() => ([]));
-                 const items = Array.isArray(data) ? data : (data.items ?? []);
-                 $dlResp.innerHTML = "";
-                 for (const it of items) {
-                     const nombre = pick(it, ["Nombre_Empleado", "Nombre"]) || "";
-                     const depto = pick(it, ["Dpto_Empleado", "Departamento"]) || "";
-                     const puesto = pick(it, ["Puesto_Empleado", "Puesto"]) || "";
-                     const reloj = pick(it, ["Num_Reloj_Empleado", "Reloj"]) || "";
-                     const opt = document.createElement('option');
-                     opt.value = nombre;
-                     opt.setAttribute('data-reloj', reloj);
-                     opt.setAttribute('data-depto', depto);
-                     opt.setAttribute('data-puesto', puesto);
-                     $dlResp.appendChild(opt);
-                 }
-             } catch (e) {
-                 console.error(e);
-                 $dlResp.innerHTML = "";
-             }
-         }
+          async function buscarResponsables(term) {
+              
+              if (!/^\d{2,}$/.test(term)) { $dlResp.innerHTML = ""; return []; }
+              try {
+                  const url = `${API}/api/salida/responsables?term=${encodeURIComponent(term)}`;
+                  const res = await fetch(url);
+                  const data = await res.json().catch(() => ([]));
+                  const items = Array.isArray(data) ? data : (data.items ?? []);
+                  $dlResp.innerHTML = "";
+                  for (const it of items) {
+                      const nombre = pick(it, ["Nombre_Empleado", "Nombre"]) || "";
+                      const depto = pick(it, ["Dpto_Empleado", "Departamento"]) || "";
+                      const puesto = pick(it, ["Puesto_Empleado", "Puesto"]) || "";
+                      const reloj = pick(it, ["Num_Reloj_Empleado", "Reloj"]) || "";
+                      
+                      const opt = document.createElement('option');
+                      opt.value = reloj;
+                      opt.setAttribute('data-nombre', nombre);
+                      opt.setAttribute('data-depto', depto);
+                      opt.setAttribute('data-puesto', puesto);
+                      $dlResp.appendChild(opt);
+                  }
+                  return items;
+              } catch (e) {
+                  console.error(e);
+                  $dlResp.innerHTML = "";
+                  return [];
+              }
+          }
 
-         function onResponsableChanged() {
-             const val = $inputResp.value.trim();
-             const match = [...$dlResp.querySelectorAll('option')].find(o => o.value.toLowerCase() === val.toLowerCase());
-             if (match) {
-                 const nombre = match.value;
-                 const reloj = match.getAttribute('data-reloj') || "";
-                 const depto = match.getAttribute('data-depto') || "";
-                 const puesto = match.getAttribute('data-puesto') || "";
-                 setEmpleadoFromSelection(nombre, depto, puesto, reloj);
-             } else {
-                 clearEmpleado();
-             }
-         }
+          function onResponsableChanged() {
+              const reloj = $inputResp.value.trim();
+              const match = [...$dlResp.querySelectorAll('option')].find(o => o.value === reloj);
+              if (match) {
+                  const nombre = match.getAttribute('data-nombre') || "";
+                  const depto = match.getAttribute('data-depto') || "";
+                  const puesto = match.getAttribute('data-puesto') || "";
+                  setEmpleadoFromSelection(nombre, depto, puesto, reloj);
+              } else {
+                  clearEmpleado();
+              }
+          }
 
-         if ($cant) $cant.addEventListener('input', updateRegistrarEnabled);
+          if ($cant) $cant.addEventListener('input', updateRegistrarEnabled);
 
-         if ($btnBA) {
-             $btnBA.addEventListener('click', async () => {
-                 const codigo = $codigo.value.trim();
-                 if (!codigo) { alert("Ingresa un código de artículo."); return; }
-                 if ($hint) $hint.textContent = "Buscando artículo…";
-                 try {
-                     const qs = new URLSearchParams({ codigo });
-                     const res = await fetch(`${API}/api/salida/lookup?${qs.toString()}`);
-                     const json = await res.json().catch(() => ({}));
-                     const raw = json.articulo ?? json.Articulo ?? json;
-                     const art = normalizeArticulo(raw);
-                     if (art && (art.Codigo_Articulo || art.Numero_Parte_Articulo)) {
-                         setArticulo(art);
-                         if ($hint) $hint.textContent = "";
-                     } else {
-                         setArticulo(null);
-                         if ($hint) $hint.textContent = "Artículo no encontrado";
-                     }
-                 } catch (e) {
-                     console.error(e);
-                     if ($hint) $hint.textContent = "Error de red";
-                 }
-             });
-         }
+          if ($btnBA) {
+              $btnBA.addEventListener('click', async () => {
+                  const codigo = $codigo.value.trim();
+                  if (!codigo) { alert("Ingresa un código de artículo."); return; }
+                  if ($hint) $hint.textContent = "Buscando artículo…";
+                  try {
+                      const qs = new URLSearchParams({ codigo });
+                      const res = await fetch(`${API}/api/salida/lookup?${qs.toString()}`);
+                      const json = await res.json().catch(() => ({}));
+                      const raw = json.articulo ?? json.Articulo ?? json;
+                      const art = normalizeArticulo(raw);
+                      if (art && (art.Codigo_Articulo || art.Numero_Parte_Articulo)) {
+                          setArticulo(art);
+                          if ($hint) $hint.textContent = "";
+                      } else {
+                          setArticulo(null);
+                          if ($hint) $hint.textContent = "Artículo no encontrado";
+                      }
+                  } catch (e) {
+                      console.error(e);
+                      if ($hint) $hint.textContent = "Error de red";
+                  }
+              });
+          }
 
-         if ($btnReg) {
-             $btnReg.addEventListener('click', async () => {
-                 const codigo = $lblCodigo.textContent.trim();
-                 const reloj = $relojHidden.value.trim();
-                 const cant = Number($cant.value);
-                 const fecha = $fecha.value;
-                 const equipo = $equipo.value.trim();
-                 const responsable = $resp.value.trim();
+          if ($btnBE) {
+              $btnBE.addEventListener('click', async () => {
+                  const term = $inputResp.value.trim();
+                  if (!/^\d{2,}$/.test(term)) { alert("Escribe un # de reloj válido."); return; }
 
-                 if (!codigo || codigo === "—") { alert("Primero busca un artículo."); return; }
-                 if (!reloj) { alert("Selecciona un responsable válido."); return; }
-                 if (!(cant > 0)) { alert("Cantidad inválida."); return; }
+                  
+                  const match = [...$dlResp.querySelectorAll('option')].find(o => o.value === term);
+                  if (match) {
+                      const nombre = match.getAttribute('data-nombre') || "";
+                      const depto = match.getAttribute('data-depto') || "";
+                      const puesto = match.getAttribute('data-puesto') || "";
+                      setEmpleadoFromSelection(nombre, depto, puesto, term);
+                      return;
+                  }
+                  try {
+                      const qs = new URLSearchParams({ reloj: term });
+                      const res = await fetch(`${API}/api/salida/lookup?${qs.toString()}`);
+                      const j = await res.json().catch(() => ({}));
+                      const emp = j.empleado ?? j.Empleado ?? j;
+                      const nombre = pick(emp, ["Nombre_Empleado", "Nombre"]) || "";
+                      const depto = pick(emp, ["Dpto_Empleado", "Departamento"]) || "";
+                      const puesto = pick(emp, ["Puesto_Empleado", "Puesto"]) || "";
+                      const reloj = pick(emp, ["Num_Reloj_Empleado", "Reloj"]) || "";
+                      if (reloj) {
+                          setEmpleadoFromSelection(nombre, depto, puesto, reloj);
+                          $inputResp.value = reloj;
+                          return;
+                      }
+                  } catch (e) { console.error(e); }
 
-                 try {
-                     $btnReg.disabled = true;
-                     if ($hint) $hint.textContent = "Registrando salida…";
+                  
+                  const items = await buscarResponsables(term);
+                  if (items && items.length === 1) {
+                      const it = items[0];
+                      const nombre = pick(it, ["Nombre_Empleado", "Nombre"]) || "";
+                      const depto = pick(it, ["Dpto_Empleado", "Departamento"]) || "";
+                      const puesto = pick(it, ["Puesto_Empleado", "Puesto"]) || "";
+                      const reloj = pick(it, ["Num_Reloj_Empleado", "Reloj"]) || "";
+                      setEmpleadoFromSelection(nombre, depto, puesto, reloj);
+                      $inputResp.value = reloj;
+                  } else if (items && items.length > 1) {
+                      alert("Hay varias coincidencias de # reloj, selecciona una de la lista.");
+                  } else {
+                      alert("Empleado no encontrado.");
+                      clearEmpleado();
+                  }
+              });
+          }
 
-                     const res = await fetch(`${API}/api/salida/registrar`, {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({
-                             Codigo_Articulo: codigo,
-                             Cantidad: cant,
-                             Num_Reloj_Empleado: reloj,
-                             Equipo: equipo || null,
-                             Responsable: responsable || null,
-                             Fecha_Salida: fecha || null
-                         })
-                     });
+          if ($inputResp) {
+              let t;
+              $inputResp.addEventListener('input', () => {
+                  clearTimeout(t);
+                  const term = $inputResp.value.trim();
+                  if (!/^\d{2,}$/.test(term)) { $dlResp.innerHTML = ""; clearEmpleado(); return; }
+                  t = setTimeout(() => buscarResponsables(term), 200);
+              });
+              $inputResp.addEventListener('change', onResponsableChanged);
+              $inputResp.addEventListener('blur', onResponsableChanged);
+              $inputResp.addEventListener('keydown', (e) => {
+                  if (e.key === "Enter") { e.preventDefault(); $btnBE?.click(); }
+              });
+          }
 
-                     const payload = await res.json().catch(() => ({}));
-                     if (!res.ok) {
-                         alert(payload?.message || "Error al registrar");
-                         if ($hint) $hint.textContent = "";
-                         updateRegistrarEnabled();
-                         return;
-                     }
+          if ($codigo) {
+              $codigo.addEventListener('keydown', (e) => {
+                  if (e.key === "Enter") { e.preventDefault(); $btnBA?.click(); }
+              });
+          }
 
-                     if (payload?.stockNuevo !== undefined) $lblStock.textContent = payload.stockNuevo;
-                     alert("Salida registrada correctamente.");
-                     if ($hint) $hint.textContent = "";
-                     $cant.value = "";
-                     $equipo.value = "";
-                     updateRegistrarEnabled();
-                     cargarMovimientos();
-                 } catch (e) {
-                     console.error(e);
-                     alert("Error de red");
-                     if ($hint) $hint.textContent = "";
-                     updateRegistrarEnabled();
-                 }
-             });
-         }
+          if ($btnReg) {
+              $btnReg.addEventListener('click', async () => {
+                  const codigo = $lblCodigo.textContent.trim();
+                  const reloj = $relojHidden.value.trim();
+                  const cant = Number($cant.value);
+                  const fecha = $fecha.value;
+                  const equipo = $equipo.value.trim();
+                  const responsable = $resp.value.trim();
 
-         if ($inputResp) {
-             let t;
-             $inputResp.addEventListener('input', () => {
-                 clearTimeout(t);
-                 const term = $inputResp.value.trim();
-                 if (!term || term.length < 2) { $dlResp.innerHTML = ""; clearEmpleado(); return; }
-                 t = setTimeout(() => buscarResponsables(term), 200);
-             });
-             $inputResp.addEventListener('change', onResponsableChanged);
-             $inputResp.addEventListener('blur', onResponsableChanged);
-         }
+                  if (!codigo || codigo === "—") { alert("Primero busca un artículo."); return; }
+                  if (!reloj) { alert("Selecciona un responsable válido (# reloj)."); return; }
+                  if (!(cant > 0)) { alert("Cantidad inválida."); return; }
 
-         if ($codigo) {
-             $codigo.addEventListener('keydown', (e) => {
-                 if (e.key === "Enter") { e.preventDefault(); $btnBA?.click(); }
-             });
-         }
+                  try {
+                      $btnReg.disabled = true;
+                      if ($hint) $hint.textContent = "Registrando salida…";
 
-         if ($btnFiltrar) $btnFiltrar.addEventListener('click', cargarMovimientos);
-         if ($btnLimpiar) $btnLimpiar.addEventListener('click', () => {
-             if ($fCodigo) $fCodigo.value = "";
-             if ($fResp) $fResp.value = "";
-             if ($fDel) $fDel.value = "";
-             if ($fAl) $fAl.value = "";
-             cargarMovimientos();
-         });
-         if ($btnExcel) $btnExcel.addEventListener('click', descargarExcel);
+                      const res = await fetch(`${API}/api/salida/registrar`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                              Codigo_Articulo: codigo,
+                              Cantidad: cant,
+                              Num_Reloj_Empleado: reloj,
+                              Equipo: equipo || null,
+                              Responsable: responsable || null,
+                              Fecha_Salida: fecha || null
+                          })
+                      });
 
-         [$fCodigo, $fResp, $fDel, $fAl].forEach(inp => {
-             inp?.addEventListener('keydown', (e) => {
-                 if (e.key === "Enter") { e.preventDefault(); cargarMovimientos(); }
-             });
-         });
+                      const payload = await res.json().catch(() => ({}));
+                      if (!res.ok) {
+                          alert(payload?.message || "Error al registrar");
+                          if ($hint) $hint.textContent = "";
+                          updateRegistrarEnabled();
+                          return;
+                      }
 
-         cargarMovimientos();
-         window.cargarMovimientos = cargarMovimientos;
-     })();
- </script>
+                      if (payload?.stockNuevo !== undefined) $lblStock.textContent = payload.stockNuevo;
+                      alert("Salida registrada correctamente.");
+                      if ($hint) $hint.textContent = "";
+                      $cant.value = "";
+                      $equipo.value = "";
+                      updateRegistrarEnabled();
+                      cargarMovimientos();
+                  } catch (e) {
+                      console.error(e);
+                      alert("Error de red");
+                      if ($hint) $hint.textContent = "";
+                      updateRegistrarEnabled();
+                  }
+              });
+          }
 
+          if ($btnFiltrar) $btnFiltrar.addEventListener('click', cargarMovimientos);
+          if ($btnLimpiar) $btnLimpiar.addEventListener('click', () => {
+              if ($fCodigo) $fCodigo.value = "";
+              if ($fResp) $fResp.value = "";
+              if ($fDel) $fDel.value = "";
+              if ($fAl) $fAl.value = "";
+              cargarMovimientos();
+          });
+          if ($btnExcel) $btnExcel.addEventListener('click', descargarExcel);
 
+          [$fCodigo, $fResp, $fDel, $fAl].forEach(inp => {
+              inp?.addEventListener('keydown', (e) => {
+                  if (e.key === "Enter") { e.preventDefault(); cargarMovimientos(); }
+              });
+          });
+
+          cargarMovimientos();
+          window.cargarMovimientos = cargarMovimientos;
+      })();
+  </script>
 
 </asp:Content>

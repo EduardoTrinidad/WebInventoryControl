@@ -36,13 +36,13 @@
     </nav>
 
     <div id="flyout" class="menu-flyout" role="menu" aria-label="Menú principal">
-      <a href="Inicio.aspx"><i class="bi bi-house"></i> Inicio</a>
-      <a href="Inventario.aspx"><i class="bi bi-box-seam"></i> Inventario</a>
-      <a href="Articulos.aspx"><i class="bi bi-plus-square"></i> Agregar Producto</a>
-      <a href="Stockmaximo.aspx"><i class="bi bi-bag-plus"></i> Stock</a>
+      <a href="Inicio.aspx"><i class="bi bi-house"></i> Menu Principal</a>
+      <a href="Inventario.aspx"><i class="bi bi-box-seam"></i> Inventario General</a>
+      <a href="Stockmaximo.aspx"><i class="bi bi-bag-plus"></i> Stock General</a>
       <a href="Usuarios.aspx"><i class="bi bi-person-plus"></i> Usuarios</a>
       <a href="Provedores.aspx"><i class="bi bi-basket"></i> Provedores</a>
-      <a href="Huellas.aspx"><i class="bi bi-hand-index-thumb"></i> Registro de Huellas</a>
+      <a href="Articulos.aspx"><i class="bi bi-plus-square"></i> Salida</a>
+      <a href="Huella.aspx"><i class="bi bi-hand-index-thumb"></i> Entradas</a>
 
       <asp:ContentPlaceHolder ID="SidebarContent" runat="server" />
     </div>

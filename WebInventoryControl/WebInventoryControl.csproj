@@ -256,7 +256,9 @@
     <Content Include="Entrada.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Huellas.aspx" />
+    <Content Include="Huellas.aspx">
+      <BrowseToURL>~/Hues.aspx</BrowseToURL>
+    </Content>
     <Content Include="Inicio.aspx" />
     <Content Include="Inventario.aspx" />
     <Content Include="Login.aspx" />
@@ -365,7 +367,6 @@
     </Compile>
     <Compile Include="Entrada.aspx.cs">
       <DependentUpon>Entrada.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Entrada.aspx.designer.cs">
       <DependentUpon>Entrada.aspx</DependentUpon>
