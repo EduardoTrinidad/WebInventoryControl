@@ -1,20 +1,27 @@
-﻿:root {
+﻿/* ===== Tokens base con más contraste ===== */
+:root {
     --bg: #f7fafc;
-    --fg: #0f172a;
-    --muted: #6b7280;
+    --fg: #0b1328;
+    --muted: #5b677c;
     --card-bg: #ffffff;
-    --card-fg: #0f172a;
-    --card-muted: #6b7280;
-    --card-border: rgba(15,23,42,.12);
+    --card-fg: #0b1328;
+    --card-muted: #64748b;
+    --card-border: rgba(15,23,42,.18);
     --field-bg: #f8fafc;
-    --field-fg: #0f172a;
-    --field-border: rgba(2,6,23,.12);
+    --field-fg: #0b1328;
+    --field-border: rgba(2,6,23,.2);
     --accent-a: #2A7B9B;
     --accent-b: #57C785;
     --accent-c: #EDDD53;
     --focus: #2A7B9B;
     --shadow-lg: 0 18px 36px rgba(2,6,23,.12),0 6px 16px rgba(2,6,23,.06),0 1px 2px rgba(2,6,23,.04);
-    --shadow-sm: 0 10px 20px rgba(2,6,23,.08),0 3px 8px rgba(2,6,23,.06);
+    --shadow-sm: 0 10px 20px rgba(2,6,23,.10),0 3px 8px rgba(2,6,23,.06);
+}
+
+html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 400 16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
 }
 
 .is-hidden {
@@ -23,13 +30,15 @@
 
 .pill {
     display: inline-block;
-    font-size: .75rem;
-    padding: .15rem .5rem;
+    font-size: .78rem;
+    padding: .2rem .55rem;
     border-radius: 999px;
     background: rgba(2,6,23,.06);
-    color: var(--card-fg)
+    color: var(--card-fg);
+    font-weight: 600
 }
 
+/* ===== Card ===== */
 .card {
     margin-top: 1rem;
     background: var(--card-bg);
@@ -46,7 +55,7 @@
     gap: .8rem;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--card-border);
-    background: linear-gradient(135deg,rgba(42,123,155,.10),rgba(87,199,133,.10) 58%,rgba(237,221,83,.10) 100%)
+    background: linear-gradient(135deg,rgba(42,123,155,.10),rgba(87,199,133,.10) 58%,rgba(237,221,83,.08) 100%)
 }
 
 .badge {
@@ -66,6 +75,7 @@
     padding: 1rem 1.25rem
 }
 
+/* ===== Layout ===== */
 .grid {
     display: grid;
     grid-template-columns: repeat(2,minmax(0,1fr));
@@ -81,10 +91,11 @@
 .field label {
     display: block;
     font-size: .9rem;
-    color: var(--card-fg);
+    color: var(--card-muted);
     margin-bottom: .25rem
 }
 
+/* ===== Controles ===== */
 .control {
     width: 100%;
     background: var(--field-bg);
@@ -96,9 +107,13 @@
     transition: box-shadow .15s,border-color .15s,transform .06s
 }
 
+    .control::placeholder {
+        color: #9aa4b2
+    }
+
     .control:focus {
         border-color: var(--focus);
-        box-shadow: 0 0 0 3px rgba(42,123,155,.15)
+        box-shadow: 0 0 0 3px rgba(42,123,155,.18)
     }
 
 .value {
@@ -114,7 +129,7 @@
 }
 
 .muted {
-    color: #94a3b8;
+    color: var(--muted);
     font-weight: 500
 }
 
@@ -125,6 +140,7 @@
     flex-wrap: wrap
 }
 
+/* ===== Botones ===== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -143,7 +159,7 @@
     }
 
     .btn:disabled {
-        opacity: .5;
+        opacity: .55;
         cursor: not-allowed
     }
 
@@ -152,6 +168,10 @@
     background: linear-gradient(135deg,var(--accent-a),var(--accent-b));
     box-shadow: var(--shadow-sm)
 }
+
+    .btn-primary:hover {
+        filter: saturate(1.08)
+    }
 
 .btn-outline {
     background: #fff;
@@ -162,17 +182,10 @@
 .btn-secondary {
     color: var(--card-fg);
     background: #fff;
-    border-color: var(--card-border);
     border: 1px solid var(--card-border)
 }
 
-.actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-start;
-    margin: 8px 0 12px
-}
-
+/* ===== Tabla ===== */
 .table-wrap {
     background: #fff;
     border-top: 1px solid var(--card-border)
@@ -180,7 +193,8 @@
 
 .table-scroll {
     overflow: auto;
-    max-height: 360px
+    max-height: 420px;
+    border-radius: 12px
 }
 
     .table-scroll::-webkit-scrollbar {
@@ -189,7 +203,7 @@
     }
 
     .table-scroll::-webkit-scrollbar-thumb {
-        background: rgba(2,6,23,.18);
+        background: rgba(2,6,23,.22);
         border-radius: 10px
     }
 
@@ -200,23 +214,35 @@
 .users-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0
+    border-spacing: 0;
+    font-size: .95rem;
+    min-width: 980px; /* evita que se “compriman” columnas */
+    color: var(--card-fg);
 }
 
     .users-table thead th {
         position: sticky;
         top: 0;
         z-index: 2;
-        background: var(--accent-a);
+        background: linear-gradient(135deg,var(--accent-a),#1f5d77);
         color: #fff;
         text-align: left;
-        padding: .65rem .8rem;
-        font-weight: 700;
-        letter-spacing: .2px
+        padding: .7rem .85rem;
+        font-weight: 800;
+        letter-spacing: .2px;
+        box-shadow: 0 2px 0 rgba(2,6,23,.08)
     }
 
+        .users-table thead th:first-child {
+            border-top-left-radius: 12px
+        }
+
+        .users-table thead th:last-child {
+            border-top-right-radius: 12px
+        }
+
     .users-table tbody td {
-        padding: .6rem .8rem;
+        padding: .6rem .85rem;
         border-bottom: 1px solid var(--card-border);
         color: var(--card-fg);
         vertical-align: top;
@@ -224,30 +250,74 @@
     }
 
     .users-table tbody tr:nth-child(odd) td {
-        background: rgba(2,6,23,.01)
+        background: #fafcff
     }
 
     .users-table tbody tr:hover td {
-        background: rgba(42,123,155,.06)
+        background: rgba(42,123,155,.08)
     }
 
-    .users-table td:nth-child(5), .users-table td:nth-child(6) {
+    .users-table td:nth-child(5),
+    .users-table td:nth-child(6) {
         white-space: normal;
-        max-width: 320px;
+        max-width: 420px;
         overflow-wrap: anywhere
     }
 
+@media (max-width:680px) {
+    .users-table {
+        font-size: .92rem
+    }
+
+        .users-table td:nth-child(5), .users-table td:nth-child(6) {
+            max-width: 220px
+        }
+}
+
+/* ===== Estados ===== */
+.empty {
+    padding: 1rem;
+    border: 1px dashed var(--card-border);
+    border-radius: 12px;
+    color: var(--muted);
+    background: linear-gradient(180deg,#fff,rgba(2,6,23,.02))
+}
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: #e9eef6;
+    border-radius: 10px;
+    min-height: 42px
+}
+
+    .skeleton::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+        transform: translateX(-100%);
+        animation: sweep 1.2s infinite
+    }
+
+@keyframes sweep {
+    to {
+        transform: translateX(100%)
+    }
+}
+
+/* ===== Dark mode ===== */
 [data-bs-theme="dark"] {
     --bg: #0b1220;
     --fg: #e5e7eb;
-    --muted: #94a3b8;
+    --muted: #a6b3c7;
     --card-bg: #0b1220;
     --card-fg: #e5e7eb;
-    --card-muted: #94a3b8;
-    --card-border: rgba(148,163,184,.22);
+    --card-muted: #9fb0c7;
+    --card-border: rgba(148,163,184,.28);
     --field-bg: #0e1628;
     --field-fg: #e5e7eb;
-    --field-border: rgba(148,163,184,.22);
+    --field-border: rgba(148,163,184,.28);
     --shadow-lg: 0 18px 36px rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
     --shadow-sm: 0 10px 20px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.25)
 }
@@ -273,51 +343,15 @@
         background: #15485b
     }
 
+    [data-bs-theme="dark"] .users-table tbody tr:nth-child(odd) td {
+        background: #0e172b
+    }
+
     [data-bs-theme="dark"] .users-table tbody tr:hover td {
         background: rgba(21,72,91,.35)
     }
 
-.articulo-card {
-    background: var(--card-bg);
-    color: var(--card-fg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
-    overflow: hidden
-}
-
-.articulo-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 18px;
-    border-bottom: 1px solid var(--card-border);
-    background: linear-gradient(135deg,rgba(42,123,155,.10),rgba(87,199,133,.10) 58%,rgba(237,221,83,.10))
-}
-
-.articulo-title {
-    margin: 0;
-    font-size: 1.1rem
-}
-
-.articulo-sub {
-    margin: 2px 0 0;
-    color: var(--card-muted);
-    font-size: .9rem
-}
-
-hr {
-    border: none;
-    border-top: 1px solid var(--card-border);
-    margin: 12px 0
-}
-
-#hint, #movHint {
-    color: #64748b
-}
-
-@media (max-width:680px) {
-    .users-table td:nth-child(5), .users-table td:nth-child(6) {
-        max-width: 220px
-    }
+/* ===== Utilidades ===== */
+.force-visible, * {
+    color: inherit
 }

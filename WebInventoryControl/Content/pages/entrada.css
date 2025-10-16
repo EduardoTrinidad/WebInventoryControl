@@ -1,9 +1,52 @@
-﻿.card {
+﻿/* ===============================
+   Paleta base (teal → verde)
+   =============================== */
+:root {
+    --bg: #f7fafc;
+    --fg: #0b1328;
+    --muted: #5b677c;
+    --card-bg: #ffffff;
+    --card-fg: #0b1328;
+    --card-muted: #64748b;
+    --card-border: rgba(15,23,42,.18);
+    --field-bg: #f8fafc;
+    --field-fg: #0b1328;
+    --field-border: rgba(2,6,23,.20);
+    /* Acentos */
+    --accent-a: #0f5f73; /* teal profundo (lado izquierdo) */
+    --accent-b: #10b981; /* verde esmeralda (lado derecho) */
+    --focus: #2A7B9B;
+    /* Efectos */
+    --shadow-lg: 0 18px 36px rgba(2,6,23,.12),0 6px 16px rgba(2,6,23,.06),0 1px 2px rgba(2,6,23,.04);
+    --shadow-sm: 0 10px 20px rgba(2,6,23,.10),0 3px 8px rgba(2,6,23,.06);
+    /* Tabla */
+    --thead-a: #0f4f63; /* header degradado inicio (más oscuro) */
+    --thead-b: #10b981; /* header degradado fin */
+    --row-odd: #f0fdf4; /* fila impar */
+    --row-hover: rgba(16,185,129,.15); /* hover */
+}
+
+html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 400 16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+}
+
+.is-hidden {
+    display: none !important
+}
+
+/* ===============================
+   Card
+   =============================== */
+.card {
     margin-top: 1rem;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,.08);
+    background: var(--card-bg);
+    color: var(--card-fg);
+    border: 1px solid var(--card-border);
     border-radius: 16px;
-    box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
 }
 
 .card-h {
@@ -11,21 +54,31 @@
     gap: .8rem;
     align-items: center;
     padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(0,0,0,.06);
+    border-bottom: 1px solid var(--card-border);
+    /* leve brillo superior */
+    background: linear-gradient(135deg,rgba(15,95,115,.08),rgba(16,185,129,.08) 58%,rgba(237,221,83,.06) 100%);
 }
 
 .badge {
-    background: #10b981;
-    color: #fff;
-    font-weight: 700;
+    display: inline-grid;
+    place-items: center;
+    min-width: 42px;
+    height: 42px;
     padding: .25rem .6rem;
-    border-radius: 999px;
+    border-radius: 10px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg,var(--accent-a),var(--accent-b));
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.22);
 }
 
 .card-b {
-    padding: 1rem 1.25rem;
+    padding: 1rem 1.25rem
 }
 
+/* ===============================
+   Layout y campos
+   =============================== */
 .grid {
     display: grid;
     grid-template-columns: repeat(2,minmax(0,1fr));
@@ -40,75 +93,276 @@
 
 .field label {
     display: block;
+    font-size: .9rem;
+    color: var(--card-muted);
     margin-bottom: .25rem;
-    color: #0f172a;
 }
 
 .control {
     width: 100%;
-    padding: .6rem .7rem;
+    background: var(--field-bg);
+    color: var(--field-fg);
+    border: 1px solid var(--field-border);
     border-radius: 10px;
-    border: 1px solid rgba(0,0,0,.12);
-    background: #f8fafc;
+    padding: .65rem .8rem;
+    outline: none;
+    transition: box-shadow .15s,border-color .15s,transform .06s;
 }
+
+    .control::placeholder {
+        color: #9aa4b2
+    }
+
+    .control:focus {
+        border-color: var(--focus);
+        box-shadow: 0 0 0 3px rgba(42,123,155,.18);
+    }
 
 .value {
     display: block;
+    width: 100%;
+    min-height: 42px;
     padding: .6rem .7rem;
     border-radius: 10px;
-    border: 1px dashed rgba(0,0,0,.12);
+    border: 1px dashed var(--field-border);
     background: #fafafa;
     font-weight: 600;
+    color: var(--card-fg);
 }
 
 .muted {
-    color: #94a3b8;
+    color: var(--muted);
+    font-weight: 500
 }
 
 .row {
     display: flex;
     gap: 10px;
-    margin-top: .5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: .5rem
 }
 
+/* ===============================
+   Botones (teal → verde)
+   =============================== */
 .btn {
-    border: 0;
-    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
     padding: .65rem 1rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-weight: 700;
     cursor: pointer;
+    transition: transform .06s ease,filter .2s,box-shadow .15s;
 }
+
+    .btn:active {
+        transform: translateY(1px)
+    }
+
+    .btn:disabled {
+        opacity: .55;
+        cursor: not-allowed
+    }
 
 .btn-primary {
-    background: #0f3f66;
     color: #fff;
+    background: linear-gradient(135deg,var(--accent-a),var(--accent-b));
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary {
-    background: #fff;
-    border: 1px solid #0f3f66;
-    color: #0f3f66;
-}
+    .btn-primary:hover {
+        filter: saturate(1.08)
+    }
 
 .btn-outline {
     background: #fff;
-    border: 1px solid #0f3f66;
-    color: #0f3f66;
+    border: 1px solid var(--accent-a);
+    color: var(--accent-a);
 }
+
+    .btn-outline:hover {
+        border-color: var(--accent-b);
+        color: var(--accent-b);
+    }
+
+.btn-secondary {
+    color: var(--card-fg);
+    background: #fff;
+    border: 1px solid var(--card-border);
+}
+
+/* ===============================
+   Tabla (encabezado y filas verdes)
+   =============================== */
+.table-wrap {
+    background: #fff;
+    border-top: 1px solid var(--card-border);
+}
+
+.table-scroll {
+    overflow: auto;
+    max-height: 420px;
+    border-radius: 12px;
+}
+
+    .table-scroll::-webkit-scrollbar {
+        height: 10px;
+        width: 10px
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb {
+        background: rgba(2,6,23,.22);
+        border-radius: 10px
+    }
+
+    .table-scroll::-webkit-scrollbar-track {
+        background: rgba(2,6,23,.06)
+    }
 
 .users-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .95rem;
+    min-width: 980px; /* evita que se “prensen” columnas */
+    color: var(--card-fg);
 }
 
-    .users-table th {
-        background: #0f3f66;
+    .users-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: linear-gradient(135deg,var(--thead-a),var(--thead-b));
         color: #fff;
-        padding: .6rem;
         text-align: left;
+        padding: .7rem .85rem;
+        font-weight: 800;
+        letter-spacing: .2px;
+        box-shadow: 0 2px 0 rgba(2,6,23,.08);
     }
 
-    .users-table td {
-        padding: .6rem;
-        border-bottom: 1px solid #e2e8f0;
+        .users-table thead th:first-child {
+            border-top-left-radius: 12px
+        }
+
+        .users-table thead th:last-child {
+            border-top-right-radius: 12px
+        }
+
+    .users-table tbody td {
+        padding: .6rem .85rem;
+        border-bottom: 1px solid rgba(16,185,129,.25);
+        color: var(--card-fg);
+        vertical-align: top;
+        white-space: nowrap;
+    }
+
+    .users-table tbody tr:nth-child(odd) td {
+        background: var(--row-odd)
+    }
+
+    .users-table tbody tr:hover td {
+        background: var(--row-hover)
+    }
+
+    /* Columnas con texto largo (ajusta índices a tus columnas) */
+    .users-table td:nth-child(4), /* Descripción */
+    .users-table td:nth-child(8) { /* Cuenta */
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+@media (max-width:680px) {
+    .users-table {
+        font-size: .92rem
+    }
+
+        .users-table td:nth-child(4), .users-table td:nth-child(8) {
+            max-width: 220px
+        }
+}
+
+/* ===============================
+   Estados
+   =============================== */
+.empty {
+    padding: 1rem;
+    border: 1px dashed var(--card-border);
+    border-radius: 12px;
+    color: var(--muted);
+    background: linear-gradient(180deg,#fff,rgba(2,6,23,.02));
+}
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: #e9eef6;
+    border-radius: 10px;
+    min-height: 42px;
+}
+
+    .skeleton::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+        transform: translateX(-100%);
+        animation: sweep 1.2s infinite;
+    }
+
+@keyframes sweep {
+    to {
+        transform: translateX(100%)
+    }
+}
+
+/* ===============================
+   Modo oscuro (respeta acentos)
+   =============================== */
+[data-bs-theme="dark"] {
+    --bg: #0b1220;
+    --fg: #e5e7eb;
+    --muted: #a6b3c7;
+    --card-bg: #0b1220;
+    --card-fg: #e5e7eb;
+    --card-muted: #9fb0c7;
+    --card-border: rgba(148,163,184,.28);
+    --field-bg: #0e1628;
+    --field-fg: #e5e7eb;
+    --field-border: rgba(148,163,184,.28);
+    --shadow-lg: 0 18px 36px rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+    --shadow-sm: 0 10px 20px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.25);
+}
+
+    [data-bs-theme="dark"] .card {
+        background: var(--card-bg);
+        color: var(--card-fg)
+    }
+
+    [data-bs-theme="dark"] .control {
+        background: var(--field-bg);
+        color: var(--field-fg);
+        border-color: var(--field-border)
+    }
+
+    [data-bs-theme="dark"] .value {
+        background: #0e1628;
+        border-color: var(--field-border);
+        color: var(--card-fg)
+    }
+
+    [data-bs-theme="dark"] .users-table thead th {
+        background: linear-gradient(135deg,#0a4352,#0d7c62)
+    }
+
+    [data-bs-theme="dark"] .users-table tbody tr:nth-child(odd) td {
+        background: rgba(16,185,129,.08)
+    }
+
+    [data-bs-theme="dark"] .users-table tbody tr:hover td {
+        background: rgba(16,185,129,.22)
     }
