@@ -68,6 +68,7 @@
               <th>Precio</th>
               <th class="hide-sm">U/M</th>
               <th class="hide-sm">Categoría</th>
+              <th>Stock minimo</th>
               <th>Stock máximo</th>
               <th>Stock actual</th>
               <th class="hide-sm">Ubicación</th>
@@ -140,13 +141,16 @@
                   const precio = toNumber(pick(item, ['Precio_Articulo', 'precio_Articulo', 'Precio', 'precio']));
                   const um = pick(item, ['Unidad_Medida_Articulo', 'unidad_Medida_Articulo', 'UM', 'um']);
                   const categoria = pick(item, ['Categoria_Articulo', 'categoria_Articulo', 'Categoria', 'categoria']);
+                  const stockMin = toNumber(pick(item, ['Stock_Minimo_Articulo', 'stock_Minimo_Articulo', 'Stock_Minimo', 'stock_Minimo', 'StockMinimo']));
                   const stockMax = toNumber(pick(item, ['Stock_Maximo_Articulo', 'stock_Maximo_Articulo', 'Stock_Maximo', 'stock_Maximo', 'StockMaximo']));
                   const stockNow = toNumber(pick(item, ['Stock_Actual_Articulo', 'stock_Actual_Articulo', 'Stock_Actual', 'stock_Actual', 'StockActual']));
                   const ubicacion = pick(item, ['Ubicacion_Articulo', 'ubicacion_Articulo', 'Ubicacion', 'ubicacion']);
 
-                  const st = statusFrom(stockMax, stockNow);
+
+                  const st = statusFrom(stockMin, stockMax, stockNow);
 
                   const tr = document.createElement('tr');
+                  tr.dataset.min = String(stockMin);
                   tr.dataset.max = String(stockMax);
                   tr.dataset.now = String(stockNow);
                   if (st.key === 'over') tr.classList.add('over-max');
@@ -158,6 +162,7 @@
             <td class="num">${fmtMoney(precio)}</td>
             <td class="uom hide-sm">${um}</td>
             <td class="cat hide-sm">${categoria}</td>
+            <td class="num">${stockMin}</td>
             <td class="num">${stockMax}</td>
             <td class="num">${stockNow}</td>
             <td class="hide-sm">${ubicacion}</td>
@@ -206,7 +211,7 @@
 
           function toCSV() {
               const visibleRows = Array.from($body.querySelectorAll('tr')).filter(tr => tr.style.display !== 'none');
-              const headers = ['Código', 'Descripción', 'Marca', 'Precio', 'U/M', 'Categoría', 'Stock máximo', 'Stock actual', 'Ubicación', 'Estado'];
+              const headers = ['Código', 'Descripción', 'Marca', 'Precio', 'U/M', 'Categoría','Stock minimo', 'Stock máximo', 'Stock actual', 'Ubicación', 'Estado'];
               const lines = [headers.join(',')];
 
               visibleRows.forEach(tr => {

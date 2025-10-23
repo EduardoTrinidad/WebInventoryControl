@@ -62,7 +62,7 @@
 
                     <!-- # Reloj -->
                     <div class="form-outline mb-3">
-                      <input id="reloj" class="form-control" type="text" placeholder="# Reloj (ej. 1564)" />
+                      <input id="reloj" class="form-control" type="text" placeholder="# Numero de reloj" />
                     </div>
 
                     <!-- Contraseña -->
@@ -180,7 +180,7 @@
           xhrFields: { withCredentials: true }, // útil si usas cookies/sesión
           data: JSON.stringify({
             Num_Reloj_Empleado: reloj,
-            Contrasena: pwd // el backend también acepta "Contraseña"
+            Contraseña: pwd // el backend también acepta "Contraseña"
           })
         })
         .done(function (data) {
